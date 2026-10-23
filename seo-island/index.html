@@ -261,6 +261,14 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   box-shadow:0 8px 18px rgba(26,115,233,.35);
 }
 .wcard .go svg{width:20px;height:20px}
+.wcard .wf{display:block;margin:16px 0 6px;font-size:14px;font-weight:700;text-align:left}
+.wcard .wfield{width:100%;padding:13px 14px;border-radius:14px;border:2px solid #FFFFFF;background:#FFFFFF;color:#1B1F27;font-size:16px;font-weight:500}
+.wcard .wfield:focus{border-color:#1A73E9;outline:none}
+.inds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.inds button{padding:10px 4px;border-radius:12px;border:2px solid transparent;background:rgba(255,255,255,.65);color:#1B1F27;font-size:14px;font-weight:500;cursor:pointer}
+.inds button[aria-pressed="true"]{background:#FFFFFF;border-color:#1A73E9;font-weight:700}
+.lbl.shop{background:#FDD13C;color:#1B1F27;font-weight:700}
+.lbl.shop .rk{font-weight:500;font-size:12.5px;background:#FFFFFF;border-radius:99px;padding:2px 8px}
 .wcard .skip{margin-top:10px;border:0;background:none;color:#1B1F27;font-size:14.5px;font-weight:500;text-decoration:underline;cursor:pointer;padding:8px}
 
 .toast{
@@ -315,7 +323,7 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   <span class="sep" aria-hidden="true"></span>
   <div><h1>SEO <span>島</span></h1><p>超簡單行銷互動教室</p></div>
 </header>
-<div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">已點亮 0 / 14 格</span></div>
+<div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">排名 第 5 頁｜點亮 0 / 14</span></div>
 
 <nav class="tools" aria-label="檢視工具">
   <button class="tool" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg><span>全景</span></button>
@@ -375,13 +383,16 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 <div class="welcome" id="welcome" hidden>
   <div class="wcard" role="dialog" aria-modal="true" aria-labelledby="wTitle">
     <img class="face" src="data:image/jpeg;base64,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" alt="Sorla">
-    <div><span class="tag">情境任務｜晴天牙醫</span></div>
+    <div><span class="tag">SEO 島｜經營你的店</span></div>
     <h2 id="wTitle">網站上線半年，<br><span>Google 上卻找不到你？</span></h2>
-    <p>假設你是台中「晴天牙醫」的老闆。官網花錢做好了，搜「植牙」卻怎麼翻都翻不到自己。這座島就是你的網站，我們一起找出卡在哪。</p>
+    <p>這座島就是你的網站。先開一間店：島上會蓋起掛你招牌的店，現在它排在搜尋結果第 5 頁，我們一起把它推上第 1 名。</p>
+    <label class="wf" for="wName">你的店名</label>
+    <input class="wfield" id="wName" maxlength="12" placeholder="例如：晴天牙醫" autocomplete="off">
+    <div class="inds" id="wInd" role="group" aria-label="選擇產業"></div>
     <ul>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>14 個 SEO 關鍵，一格一個小任務</li>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>跟著情境走，3 分鐘就上手</li>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>玩過就點亮，看見網站還缺什麼</li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>14 個 SEO 關鍵，點亮一格排名就往上爬</li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>排名越高，店門口的客人越多</li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>點亮 14 格，招牌掛上第 1 名皇冠</li>
     </ul>
     <button class="go" id="wGo">跟 Sorla 一起找原因<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     <button class="skip" id="wSkip">我想自己逛</button>
@@ -487,11 +498,12 @@ const TOUR=[
 ];
 const ORDER=['kw','intent','cluster','internal','schema','geo','gsc','title','speed','mobile','index','eeat','backlinks','gbp'];
 const COACH=[
- {txt:'這座島就是晴天牙醫的網站。14 格是 14 個影響排名的關鍵，而且互相牽動：一格沒做好，後面的努力也會打折。',act:'overview'},
- {txt:'先看第一個問題：官網寫的都是「專業口腔重建」，客人實際搜的卻是「植牙費用」。字對不上，Google 就不會把你推給他們。',act:'focus'},
+ {txt:'這是「{shop}」。店蓋好了，門口卻冷冷清清：在 Google 上排第 5 頁，幾乎沒人翻得到。',act:'shop'},
+ {txt:'島上 14 格是 14 個影響排名的關鍵。每點亮一格，那格的建築就會長大，排名往上爬，店門口的客人也會變多。',act:'overview'},
+ {txt:'先看一個常見問題（用台中「晴天牙醫」當例子）：官網寫的都是「專業口腔重建」，客人實際搜的卻是「植牙費用」。字對不上，Google 就不會把你推給他們。',act:'focus'},
  {txt:'點一下正在發光的「01 關鍵字研究」，進去看看。',wait:'select:kw',hint:'點島上的「01 關鍵字研究」',pulse:'kw'},
  {txt:'每一格都有一個小任務。這題選出客人真的會搜的字，答對了，這格就會插上旗子點亮。',wait:'done:kw',hint:'選出正確答案',top:true},
- {txt:'第一格點亮了！右邊的「路線」會帶你把 7 個核心關鍵走一遍；「清單」看全部；「全景」回到整座島。剩下 13 格，換你來點亮。',last:true}
+ {txt:'第一格點亮了！排名往上爬，店門口也來了第一位客人。右邊的「路線」會帶你把 7 個核心關鍵走一遍；「清單」看全部；「全景」回到整座島。剩下 13 格，把「{shop}」推上第 1 名吧。',last:true}
 ];
 
 if(!window.THREE||!THREE.OrbitControls){
@@ -505,6 +517,12 @@ const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=
 const store={get(k,d){try{const v=localStorage.getItem('seoIsland.'+k);return v?JSON.parse(v):d;}catch(e){return d;}},
   set(k,v){try{localStorage.setItem('seoIsland.'+k,JSON.stringify(v));}catch(e){}}};
 const done=store.get('done',{}),checks=store.get('checks',{});
+const INDS={dental:{name:'牙醫診所',color:'#4FA3E3'},food:{name:'餐飲',color:'#F07E5A'},ecom:{name:'電商',color:'#F2AE0C'},b2b:{name:'B2B',color:'#1FA67A'}};
+const shop=Object.assign({name:'晴天牙醫',ind:'dental'},store.get('shop',{}));
+if(!INDS[shop.ind])shop.ind='dental';
+const litCount=()=>Object.keys(done).length;
+const rankOf=n=>Math.round(45*Math.pow(1-n/TOPICS.length,1.6))+1;
+const rankTxt=r=>r>10?`第 ${Math.ceil(r/10)} 頁`:`第 ${r} 名`;
 
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -692,14 +710,52 @@ const tiles=[],pickables=[],allGroups=[];
 TOPICS.forEach(t=>{
   const z=ZONES[t.zone],h=z.h;
   const {g,rimMat}=hexTile(h,'#F4EFE6',z.color);
-  SCENES[t.id](g,h+.07);
+  const sg=new THREE.Group();sg.position.y=h+.07;g.add(sg);
+  SCENES[t.id](sg,0);
   const p=axial(t.q,t.r);g.position.copy(p);scene.add(g);
   g.traverse(o=>{if(o.isMesh){o.userData.id=t.id;pickables.push(o);}});
-  const o={id:t.id,t,g,rimMat,orig:new THREE.Color(z.color),h,base:p.clone(),lift:0,rise:0,on:true};
+  const o={id:t.id,t,g,sg,grow:done[t.id]?1:0,rimMat,orig:new THREE.Color(z.color),h,base:p.clone(),lift:0,rise:0,on:true};
   o.flag=flagOn(g,h+.07);if(done[t.id])o.flag.visible=true;
   tiles.push(o);allGroups.push(o);t.tile=o;
 });
 const used=new Set(TOPICS.map(t=>t.q+','+t.r));
+
+/* your shop: front of the island */
+const SHOP_Q=-1,SHOP_R=2;used.add(SHOP_Q+','+SHOP_R);
+const shopT=hexTile(.7,'#F4EFE6',INDS[shop.ind].color);
+const shopG=shopT.g,SY=.77;
+const awnMat=new THREE.MeshLambertMaterial({color:INDS[shop.ind].color});
+box(shopG,.9,.5,.56,W,0,SY,-.12);
+box(shopG,.96,.05,.62,DARK,0,SY+.5,-.12);
+for(let i=0;i<6;i++){const a=box(shopG,.16,.03,.24,i%2?W:awnMat,-.4+i*.16,SY+.42,.24);a.rotation.x=.38;}
+box(shopG,.16,.3,.02,DARK,-.18,SY,.165);
+box(shopG,.3,.18,.02,'#A9CBF5',.17,SY+.09,.165);
+const signCv=document.createElement('canvas');signCv.width=512;signCv.height=160;
+const signTex=new THREE.CanvasTexture(signCv);
+const sign=new THREE.Mesh(new THREE.PlaneGeometry(.96,.3),new THREE.MeshBasicMaterial({map:signTex}));
+sign.position.set(0,SY+.72,.17);shopG.add(sign);
+box(shopG,1.02,.36,.04,DARK,0,SY+.54,.13);
+function drawSign(){
+  const c=signCv.getContext('2d'),ind=INDS[shop.ind];
+  c.fillStyle='#FFFFFF';c.fillRect(0,0,512,160);
+  c.fillStyle=ind.color;c.fillRect(0,0,512,14);c.fillRect(0,146,512,14);
+  c.fillStyle='#1B1F27';c.textAlign='center';c.textBaseline='middle';
+  let fs=72;const ff='"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+  do{c.font=`900 ${fs}px ${ff}`;fs-=4;}while(c.measureText(shop.name).width>470&&fs>28);
+  c.fillText(shop.name,256,72);
+  c.font=`500 26px ${ff}`;c.fillStyle='#5A6474';c.fillText(ind.name,256,126);
+  signTex.needsUpdate=true;
+}
+drawSign();if(document.fonts)document.fonts.ready.then(drawSign);
+const crown=new THREE.Group();crown.position.set(0,SY+1.02,.12);shopG.add(crown);
+cyl(crown,.16,.16,.08,'#F5B700',0,0,0,16);
+for(let i=0;i<5;i++){const a=i/5*Math.PI*2;add(crown,new THREE.ConeGeometry(.045,.13,6),'#F5B700',Math.sin(a)*.14,.14,Math.cos(a)*.14);}
+add(crown,new THREE.SphereGeometry(.04,10,8),'#EE5A7C',0,.06,.16);
+crown.visible=false;
+tree(shopG,.55,SY,.45,.7);tree(shopG,-.6,SY,.4,.6);
+const shopBase=axial(SHOP_Q,SHOP_R);shopG.position.copy(shopBase);scene.add(shopG);
+const shopO={g:shopG,h:SY-.07,base:shopBase.clone(),lift:0,rise:0};allGroups.push(shopO);
+function applyShop(){shopT.rimMat.color.set(INDS[shop.ind].color);awnMat.color.set(INDS[shop.ind].color);drawSign();updateProg();}
 function ring(n){const out=[];if(!n)return [[0,0]];const dirs=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];let q=-n,r=n;
   for(let i=0;i<6;i++)for(let j=0;j<n;j++){out.push([q,r]);q+=dirs[i][0];r+=dirs[i][1];}return out;}
 let seed=7;const rnd=()=>((seed=(seed*9301+49297)%233280)/233280);
@@ -759,15 +815,21 @@ for(let i=0;i<5;i++){
 const people=[];
 const SHIRTS=['#1A73E9','#FDB022','#F07E5A','#1FA67A','#7C5CE0','#EE5A7C','#F6F4EF','#3D4B63'];
 const hosts=tiles.concat(decoTiles);
-for(let i=0;i<34;i++){
-  const host=hosts[Math.floor(rnd()*hosts.length)];
+function makePerson(){
   const p=new THREE.Group();
   const body=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,.15,8),lam(SHIRTS[Math.floor(rnd()*SHIRTS.length)]));body.position.y=.075;p.add(body);
   const head=new THREE.Mesh(new THREE.SphereGeometry(.045,8,6),lam(rnd()>.5?'#F2D3B5':'#D9A97E'));head.position.y=.19;p.add(head);
   const hair=new THREE.Mesh(new THREE.SphereGeometry(.048,8,6,0,Math.PI*2,0,Math.PI/2),lam(rnd()>.3?'#2B2420':'#8A5A3B'));hair.position.y=.2;p.add(hair);
-  scene.add(p);
-  people.push({p,host,r:.5+rnd()*.3,a:rnd()*6.28,sp:(rnd()>.5?1:-1)*(.00025+rnd()*.0003)});
+  scene.add(p);return p;
 }
+for(let i=0;i<34;i++){
+  const host=hosts[Math.floor(rnd()*hosts.length)];
+  people.push({p:makePerson(),host,r:.5+rnd()*.3,a:rnd()*6.28,sp:(rnd()>.5?1:-1)*(.00025+rnd()*.0003)});
+}
+/* shoppers: one more at the door for every lit tile */
+const shoppers=[];
+for(let i=0;i<TOPICS.length;i++)shoppers.push({p:makePerson(),host:shopO,r:.62+rnd()*.25,a:.5+rnd()*2.1,sp:(rnd()>.5?1:-1)*(.00012+rnd()*.00015),i});
+people.push(...shoppers);
 
 /* links */
 const links=[];
@@ -828,6 +890,10 @@ TOPICS.forEach(t=>{
   if(done[t.id])b.classList.add('done');
   labelsEl.appendChild(b);t.label=b;
 });
+const shopLbl=el('button','lbl shop');shopLbl.setAttribute('aria-label','你的店');
+const shopName=el('span'),shopRank=el('span','rk');shopLbl.append(shopName,shopRank);
+shopLbl.addEventListener('click',()=>{if(touring)endTour();deselect();flyTo(shopBase.clone().setY(shopO.h),isMobile()?14:10);});
+labelsEl.appendChild(shopLbl);
 
 /* zone chips */
 const active=new Set();const zonesEl=$('zones');
@@ -850,16 +916,18 @@ function applyFilter(){
 let toastT;
 function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400);}
 function updateProg(){
-  const n=Object.keys(done).length;
-  $('progTxt').textContent=`已點亮 ${n} / ${TOPICS.length} 格`;
+  const n=litCount(),rk=rankTxt(rankOf(n));
+  $('progTxt').textContent=`排名 ${rk}｜點亮 ${n} / ${TOPICS.length}`;
   $('progBar').style.width=(n/TOPICS.length*100)+'%';
+  shopName.textContent=(n===TOPICS.length?'👑 ':'')+shop.name;shopRank.textContent=rk;
+  crown.visible=n===TOPICS.length;
 }
 function markDone(id){
   if(done[id])return;done[id]=1;store.set('done',done);
   const t=byId[id];t.tile.flag.visible=true;t.label.classList.add('done');
   $('sLit').classList.add('show');updateProg();renderList();
-  const n=Object.keys(done).length;
-  toast(n===TOPICS.length?'整座島都點亮了！':`點亮「${t.name}」，還差 ${TOPICS.length-n} 格`);
+  const n=litCount();
+  toast(n===TOPICS.length?`「${shop.name}」衝上第 1 名！`:`點亮「${t.name}」，排名升到${rankTxt(rankOf(n))}`);
   coachEvent('done:'+id);
 }
 
@@ -979,13 +1047,14 @@ $('tNext').addEventListener('click',()=>{if(tourIdx<TOUR.length-1){tourIdx++;ren
 const stepsEl=$('cSteps');COACH.forEach(()=>stepsEl.appendChild(el('i')));
 function renderCoach(){
   const s=COACH[coachIdx];coach.hidden=false;
-  $('cTxt').textContent=s.txt;
+  $('cTxt').textContent=s.txt.replace(/\{shop\}/g,shop.name);
   const hint=$('cHint');hint.hidden=!s.hint;hint.textContent=s.hint?'▸ '+s.hint:'';
   [...stepsEl.children].forEach((x,i)=>x.classList.toggle('on',i<=coachIdx));
   const nx=$('cNext');nx.hidden=!!s.wait;nx.textContent=s.last?'開始探索':'下一步';
   $('cSkip').hidden=!!s.last;
   coach.classList.toggle('top',!!s.top);
   TOPICS.forEach(t=>t.label.classList.toggle('pulse',t.id===s.pulse));
+  if(s.act==='shop'){deselect();flyTo(shopBase.clone().setY(shopO.h),isMobile()?14:10);}
   if(s.act==='overview'){deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());}
   if(s.act==='focus'){const o=byId.kw.tile;flyTo(o.base.clone().setY(o.h),isMobile()?24:17);}
   if(s.wait&&s.wait.startsWith('done:')&&done[s.wait.slice(5)])setTimeout(()=>coachEvent(s.wait),50);
@@ -999,9 +1068,17 @@ function coachNext(){if(coachIdx<0)return;if(COACH[coachIdx].last){endCoach();re
 function coachEvent(ev){if(coachIdx<0)return;if(COACH[coachIdx].wait===ev)setTimeout(coachNext,ev.startsWith('done')?700:250);}
 $('cNext').addEventListener('click',coachNext);
 $('cSkip').addEventListener('click',()=>endCoach());
-$('wGo').addEventListener('click',startCoach);
-$('wSkip').addEventListener('click',()=>{welcome.hidden=true;store.set('onboarded',1);});
-$('bHelp').addEventListener('click',()=>{endCoach();if(touring)endTour();deselect();welcome.hidden=false;$('wGo').focus();});
+/* shop setup in the welcome card */
+const wName=$('wName'),wInd=$('wInd');
+Object.entries(INDS).forEach(([k,v])=>{const b=el('button',null,v.name);b.type='button';b.dataset.k=k;
+  b.addEventListener('click',()=>{shop.ind=k;syncInd();});wInd.appendChild(b);});
+function syncInd(){[...wInd.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===shop.ind));}
+function openWelcome(){wName.value=shop.name;syncInd();welcome.hidden=false;}
+function saveShop(){shop.name=wName.value.trim()||shop.name||'晴天牙醫';store.set('shop',shop);applyShop();}
+$('wGo').addEventListener('click',()=>{saveShop();startCoach();});
+$('wSkip').addEventListener('click',()=>{saveShop();welcome.hidden=true;store.set('onboarded',1);});
+wName.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('wGo').click();}});
+$('bHelp').addEventListener('click',()=>{endCoach();if(touring)endTour();deselect();openWelcome();$('wGo').focus();});
 
 /* list */
 function renderList(){
@@ -1057,7 +1134,7 @@ camera.position.setFromSpherical(new THREE.Spherical(overviewDist(),.68,.3));con
 resize();applyFilter();updateLinks();updateProg();
 const startHash=location.hash.slice(1);
 if(byId[startHash])setTimeout(()=>select(startHash),reduce?0:1500);
-else if(!store.get('onboarded',0))setTimeout(()=>{welcome.hidden=false;$('wGo').focus();},reduce?0:1300);
+else if(!store.get('onboarded',0))setTimeout(()=>{openWelcome();wName.focus();},reduce?0:1300);
 
 const v=new THREE.Vector3(),t0=performance.now();
 const ease=k=>1-Math.pow(1-k,3);
@@ -1072,7 +1149,9 @@ function frame(now){
     const goal=o.id&&o.id===selected?.38:0;
     o.lift=reduce?goal:o.lift+(goal-o.lift)*.14;
     o.g.position.y=-(1-ease(o.rise))*(o.h+.7)+o.lift;
+    if(o.sg){const gg=done[o.id]?1:0;o.grow=reduce?gg:o.grow+(gg-o.grow)*.08;o.sg.scale.setScalar(.5+.5*o.grow);}
   });
+  if(!reduce&&crown.visible){crown.rotation.y=now/900;crown.position.y=SY+1.02+Math.sin(now/400)*.04;}
   if(!reduce){
     anims.forEach(f=>f(now));
     boats.forEach(b=>{const a=b.a0+now*b.sp,x=Math.cos(a)*b.rad,z=Math.sin(a)*b.rad;
@@ -1083,7 +1162,7 @@ function frame(now){
   }else boats.forEach(b=>{const a=b.a0;b.b.position.set(Math.cos(a)*b.rad,.04,Math.sin(a)*b.rad);});
   people.forEach(q=>{
     if(!reduce)q.a+=q.sp*16;
-    const hb=q.host;q.p.visible=hb.rise>.95;
+    const hb=q.host;q.p.visible=hb.rise>.95&&(q.i==null||q.i<litCount());
     q.p.position.set(hb.base.x+Math.cos(q.a)*q.r,hb.g.position.y+hb.h+.07,hb.base.z+Math.sin(q.a)*q.r);
     q.p.rotation.y=-q.a+(q.sp>0?Math.PI:0);
     if(!reduce)q.p.position.y+=Math.abs(Math.sin(now/120+q.a*10))*.02;
@@ -1106,6 +1185,10 @@ function frame(now){
     lb.classList.remove('off');
     lb.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%)`;
   });
+  if(shopO.rise<.9)shopLbl.classList.add('off');
+  else{v.copy(shopBase).setY(shopG.position.y+shopO.h+1.55).project(camera);
+    shopLbl.classList.toggle('off',v.z>1);
+    shopLbl.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%)`;}
   renderer.render(scene,camera);
 }
 requestAnimationFrame(frame);
