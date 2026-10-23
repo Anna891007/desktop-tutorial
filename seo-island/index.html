@@ -273,8 +273,46 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 
 .toast{
   position:fixed;z-index:11;left:50%;top:calc(env(safe-area-inset-top,0px) + 16px);transform:translateX(-50%);
-  background:var(--ok);color:#fff;border-radius:999px;padding:11px 20px;font-size:14.5px;font-weight:700;box-shadow:var(--shadow);white-space:nowrap;
+  background:var(--ok);color:#fff;border-radius:18px;padding:11px 20px;font-size:14.5px;font-weight:700;box-shadow:var(--shadow);
+  width:max-content;max-width:calc(100% - 32px);text-align:center;line-height:1.6;
 }
+.toast.warn{background:#2A3242}
+.tool{position:relative}
+.tool .badge{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#D23F67}
+.storm{
+  position:fixed;z-index:5;left:16px;top:calc(env(safe-area-inset-top,0px) + 146px);
+  display:inline-flex;align-items:center;gap:8px;background:#2A3242;color:#FFFFFF;border-radius:999px;
+  padding:5px 5px 5px 13px;font-size:13px;font-weight:500;box-shadow:0 3px 12px rgba(20,40,80,.16);white-space:nowrap;
+}
+.storm button{border:0;border-radius:99px;background:#FDD13C;color:#1B1F27;font-size:12.5px;font-weight:700;padding:6px 11px;cursor:pointer}
+.storm.live{background:#D23F67}
+.storm.live button{display:none}
+.bubw{position:absolute;left:0;top:0;pointer-events:auto;z-index:3}
+.bub{
+  display:block;max-width:210px;border:2px solid #1A73E9;background:#FFFFFF;color:#1B1F27;border-radius:14px;
+  padding:7px 11px;font-size:13px;font-weight:500;line-height:1.5;text-align:left;cursor:pointer;
+  box-shadow:0 6px 16px rgba(20,40,80,.22);animation:bob 1.6s ease-in-out infinite;position:relative;
+}
+.bub::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-7px;border:7px solid transparent;border-top-color:#1A73E9;border-bottom:0}
+.bub i{font-style:normal;display:block;font-size:11.5px;font-weight:700;color:#1A73E9}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.lbl .warn{display:none;color:var(--no);font-weight:700}
+.lbl.hurt{box-shadow:0 0 0 2px var(--no),0 3px 12px rgba(20,40,80,.16)}
+.lbl.hurt .warn{display:inline}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;text-align:left}
+.feats div{background:rgba(255,255,255,.72);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;color:#3A4250}
+.feats b{display:block;font-size:15px;color:#1B1F27;margin-bottom:2px}
+.mq{margin:6px 0 4px;font-size:16px;line-height:1.7;font-weight:500}
+.who2{font-size:13px;color:var(--ink-soft);margin:0}
+.mres{margin:12px 0 0;font-size:14px;line-height:1.75}
+.shareimg{display:block;width:100%;border-radius:14px;margin-top:12px;box-shadow:0 3px 12px rgba(20,40,80,.16)}
+.mrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.mrow .btn{flex:1;text-align:center;text-decoration:none;color:inherit;padding:12px 14px}
+.mrow .btn.primary{color:var(--on-brand)}
+.dexsum{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.dexsum span{background:var(--paper-2);border-radius:99px;padding:5px 11px;font-size:13px;font-weight:500}
+.list .cust{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.6}
+.list .cust.no{color:var(--ink-soft)}
 .listwrap{
   position:fixed;inset:0;z-index:8;background:rgba(10,24,48,.45);
   display:flex;align-items:center;justify-content:center;
@@ -297,6 +335,8 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   .brandcard h1{font-size:18px}
   .brandcard p{font-size:11px}
   .prog{left:12px;top:calc(env(safe-area-inset-top,0px) + 82px);font-size:12px}
+  .storm{left:12px;top:calc(env(safe-area-inset-top,0px) + 120px);font-size:12px}
+  .bub{max-width:170px;font-size:12px}
   .tools{right:12px;gap:6px}
   .tool{min-width:0;padding:10px 12px;font-size:13px;border-radius:14px}
   .tool span{display:none}
@@ -309,6 +349,11 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   }
   .sheet h2{font-size:23px}
   .coach{left:12px;right:12px;width:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 68px)}
+  .wcard{padding:20px 18px 16px}
+  .wcard img.face{width:76px;height:76px}
+  .wcard p{font-size:14.5px;line-height:1.75}
+  .feats div{font-size:12px;padding:9px 10px}
+  .feats b{font-size:14px}
   .coach.top{top:calc(env(safe-area-inset-top,0px) + 12px);bottom:auto}
 }
 @media (prefers-reduced-motion:reduce){.lbl,.prog .bar i{transition:none}.lbl.pulse{animation:none;outline:3px solid var(--brand)}}
@@ -324,11 +369,14 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   <div><h1>SEO <span>島</span></h1><p>超簡單行銷互動教室</p></div>
 </header>
 <div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">排名 第 5 頁｜點亮 0 / 14</span></div>
+<div class="storm" id="storm" aria-live="polite"><span id="stTxt">🌀 演算法颱風正在形成</span><button id="stGo">提早迎戰</button></div>
 
 <nav class="tools" aria-label="檢視工具">
   <button class="tool" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg><span>全景</span></button>
   <button class="tool" id="bTour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg><span>路線</span></button>
-  <button class="tool" id="bList"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>清單</span></button>
+  <button class="tool" id="bList"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>圖鑑</span></button>
+  <button class="tool" id="bDaily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>每日</span><i class="badge" id="dBadge" hidden></i></button>
+  <button class="tool" id="bShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>分享</span></button>
   <button class="tool" id="bLinks" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="17" r="2.5"/><circle cx="19" cy="17" r="2.5"/><path d="M6.5 15C9 7 15 7 17.5 15"/></svg><span>連線</span></button>
   <button class="tool round" id="bHelp" aria-label="重新播放教學">?</button>
 </nav>
@@ -389,11 +437,12 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
     <label class="wf" for="wName">你的店名</label>
     <input class="wfield" id="wName" maxlength="12" placeholder="例如：晴天牙醫" autocomplete="off">
     <div class="inds" id="wInd" role="group" aria-label="選擇產業"></div>
-    <ul>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>14 個 SEO 關鍵，點亮一格排名就往上爬</li>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>排名越高，店門口的客人越多</li>
-      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1A73E9"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>點亮 14 格，招牌掛上第 1 名皇冠</li>
-    </ul>
+    <div class="feats">
+      <div><b>🏪 經營你的店</b>點亮 14 格 SEO 關鍵，排名從第 5 頁爬上第 1 名</div>
+      <div><b>🙋 幫客人找答案</b>小人頭上冒出問題，答對他就走進你的店</div>
+      <div><b>🌀 演算法颱風</b>Google 核心更新來襲，沒點亮的格子會被吹壞</div>
+      <div><b>👑 每天回來玩</b>每日任務、圖鑑收集，再分享你的健檢卡</div>
+    </div>
     <button class="go" id="wGo">跟 Sorla 一起找原因<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     <button class="skip" id="wSkip">我想自己逛</button>
   </div>
@@ -402,9 +451,46 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 <div class="listwrap" id="listwrap" hidden>
   <div class="list" role="dialog" aria-modal="true" aria-labelledby="lTitle">
     <button class="close" id="lClose" aria-label="關閉">×</button>
-    <h2 id="lTitle">島上的 14 個關鍵</h2>
-    <p>編號是建議的學習順序。點任一項，直接飛到那一格。</p>
+    <h2 id="lTitle">SEO 圖鑑</h2>
+    <p>點亮一格收一張觀念卡，幫到客人就收進客人圖鑑。點任一張觀念卡，直接飛到那一格。</p>
+    <div class="dexsum" id="dexSum"></div>
     <div id="lBody"></div>
+  </div>
+</div>
+
+<div class="listwrap" id="askwrap" hidden>
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="aTitle">
+    <button class="close" id="aClose" aria-label="關閉">×</button>
+    <p class="who2" id="aWho"></p>
+    <h2 id="aTitle" class="mq"></h2>
+    <p class="note">哪一格做好了，他就能在 Google 上找到你的店？</p>
+    <div id="aOpts"></div>
+    <p class="mres" id="aRes"></p>
+  </div>
+</div>
+
+<div class="listwrap" id="dailywrap" hidden>
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <button class="close" id="dClose" aria-label="關閉">×</button>
+    <h2 id="dTitle">今日任務</h2>
+    <p id="dStreak"></p>
+    <p class="mq" id="dQ"></p>
+    <div id="dOpts"></div>
+    <p class="mres" id="dRes"></p>
+  </div>
+</div>
+
+<div class="listwrap" id="sharewrap" hidden>
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+    <button class="close" id="shClose" aria-label="關閉">×</button>
+    <h2 id="shTitle">我的網站島健檢卡</h2>
+    <p>存下圖片，分享到 Threads、IG 限動或 LINE。</p>
+    <img class="shareimg" id="shImg" alt="網站島健檢卡">
+    <div class="mrow">
+      <a class="btn primary" id="shDl" download="seo-island.png">下載圖片</a>
+      <button class="btn" id="shShare" hidden>分享</button>
+      <a class="btn" href="https://geniushub.cc/contact-us/" target="_blank" rel="noopener">免費 SEO 健檢</a>
+    </div>
   </div>
 </div>
 
@@ -503,7 +589,35 @@ const COACH=[
  {txt:'先看一個常見問題（用台中「晴天牙醫」當例子）：官網寫的都是「專業口腔重建」，客人實際搜的卻是「植牙費用」。字對不上，Google 就不會把你推給他們。',act:'focus'},
  {txt:'點一下正在發光的「01 關鍵字研究」，進去看看。',wait:'select:kw',hint:'點島上的「01 關鍵字研究」',pulse:'kw'},
  {txt:'每一格都有一個小任務。這題選出客人真的會搜的字，答對了，這格就會插上旗子點亮。',wait:'done:kw',hint:'選出正確答案',top:true},
- {txt:'第一格點亮了！排名往上爬，店門口也來了第一位客人。右邊的「路線」會帶你把 7 個核心關鍵走一遍；「清單」看全部；「全景」回到整座島。剩下 13 格，把「{shop}」推上第 1 名吧。',last:true}
+ {txt:'第一格點亮了！排名往上爬，店門口也來了第一位客人。接下來：島上小人頭頂冒出問題時，點他、幫他找答案；也注意左上角的颱風預報，沒點亮的格子會被吹壞。把「{shop}」推上第 1 名吧！',last:true}
+];
+const ASKS=[
+ {id:'a1',who:'上班族',q:'下班後還能看牙嗎？附近有開到晚上的嗎？',a:'gbp',why:'營業時間寫在 Google 商家檔案，客人在地圖上就看得到。'},
+ {id:'a2',who:'新手媽媽',q:'用手機看你們網站，字好小、按鈕好難按…',a:'mobile',why:'行動版體驗沒做好，手機客人會直接離開。'},
+ {id:'a3',who:'大學生',q:'網頁轉了好久還沒出來，算了換一家。',a:'speed',why:'網站速度太慢，客人等不及就走了。'},
+ {id:'a4',who:'工程師',q:'我問 ChatGPT 推薦哪家，它沒提到你們。',a:'geo',why:'做好 GEO，AI 回答問題時才會引用你的內容。'},
+ {id:'a5',who:'阿嬤',q:'這家到底有沒有經驗？網站上看不出來。',a:'eeat',why:'E-E-A-T：放上真實作者、經歷和案例，客人才敢信。'},
+ {id:'a6',who:'老客人',q:'我只搜得到你們首頁，服務頁都找不到。',a:'index',why:'頁面沒被索引，Google 根本不知道它存在。'},
+ {id:'a7',who:'設計師',q:'搜尋結果那行標題，看不出你們在賣什麼。',a:'title',why:'標題與描述，決定客人點不點進來。'},
+ {id:'a8',who:'小資族',q:'我只是想先比價，不要一直叫我填表單！',a:'intent',why:'搜尋意圖：想比價的人要給價格資訊，不是聯絡表單。'},
+ {id:'a9',who:'記者',q:'有沒有可信的網站推薦過這家？',a:'backlinks',why:'外部連結，就是其他網站替你背書。'},
+ {id:'a10',who:'研究生',q:'看完這篇想看相關的，卻找不到下一篇在哪。',a:'internal',why:'內部連結把相關頁面串起來，客人和 Google 都走得下去。'},
+ {id:'a11',who:'做功課派',q:'有沒有一篇從頭講到尾的完整指南？',a:'cluster',why:'主題叢集：一篇主文帶多篇子文，內容又深又完整。'},
+ {id:'a12',who:'路人',q:'別家搜尋結果有星等和營業時間，你們怎麼沒有？',a:'schema',why:'結構化資料讓 Google 讀懂並顯示星等、地址等資訊。'},
+ {id:'a13',who:'新客人',q:'我搜「植牙費用」，跑出來的都是別家。',a:'kw',why:'關鍵字研究：網站要寫客人真的會搜的字。'},
+ {id:'a14',who:'店長',q:'上個月到底多少人從 Google 找到我們？',a:'gsc',why:'Search Console 看得到曝光、點擊和客人搜的字。'}
+];
+const DAILY=[
+ {q:'Google 主要用哪個版本的網站內容來建立索引？',o:['電腦版','手機版','平板版'],a:1,why:'Google 採行動版內容優先索引，手機版沒寫的內容可能不被看見。'},
+ {q:'網頁標題（title）中文大約多長，比較不會被截掉？',o:['10 字內','30 字內','80 字內'],a:1,why:'約 30 字內較安全，實際截斷位置依螢幕寬度而定。'},
+ {q:'哪個工具看得到「客人用什麼字搜到你」？',o:['Search Console','Photoshop','LINE'],a:0,why:'Search Console 的成效報表會列出帶來曝光與點擊的搜尋字。'},
+ {q:'花小錢買 1000 個論壇連結，最可能發生什麼事？',o:['排名飆升','被判定操縱排名','什麼都不會發生'],a:1,why:'低品質連結可能被視為垃圾連結，反而傷害網站。'},
+ {q:'想讓 AI 搜尋引用你，段落開頭最好怎麼寫？',o:['先講公司理念','直接給答案','放一張大圖'],a:1,why:'AI 偏好直接回答問題的段落：先給答案，再補細節。'},
+ {q:'Sitemap 的主要用途是什麼？',o:['告訴 Google 網站有哪些頁面','讓網站變漂亮','讓網站變快'],a:0,why:'Sitemap 幫 Google 找到並收錄你的頁面。'},
+ {q:'連結文字寫哪一種最好？',o:['點此','植牙費用說明','更多'],a:1,why:'寫出目標頁在講什麼，人和機器都看得懂。'},
+ {q:'Google 商家檔案最該定期做什麼？',o:['回覆評論、更新照片','每週改一次店名','刪掉所有負評'],a:0,why:'持續更新、回覆評論的商家檔案，在地圖上更有競爭力。'},
+ {q:'E-E-A-T 的第一個 E 代表什麼？',o:['Experience 經驗','Email 信箱','Easy 簡單'],a:0,why:'經驗、專業、權威、可信，是 Google 判斷內容品質的方向。'},
+ {q:'Google 核心更新來的時候，最好的應對是？',o:['趕快換網址','持續把內容做得對客人有用','先把網站關掉'],a:1,why:'核心更新獎勵真正有用的內容，持續做好基本功最穩。'}
 ];
 
 if(!window.THREE||!THREE.OrbitControls){
@@ -520,8 +634,11 @@ const done=store.get('done',{}),checks=store.get('checks',{});
 const INDS={dental:{name:'牙醫診所',color:'#4FA3E3'},food:{name:'餐飲',color:'#F07E5A'},ecom:{name:'電商',color:'#F2AE0C'},b2b:{name:'B2B',color:'#1FA67A'}};
 const shop=Object.assign({name:'晴天牙醫',ind:'dental'},store.get('shop',{}));
 if(!INDS[shop.ind])shop.ind='dental';
+const damaged=store.get('damaged',{}),helped=store.get('helped',{}),daily=store.get('daily',{last:'',streak:0});
 const litCount=()=>Object.keys(done).length;
-const rankOf=n=>Math.round(45*Math.pow(1-n/TOPICS.length,1.6))+1;
+const helpedCount=()=>Object.keys(helped).length;
+const rankOf=n=>Math.min(46,Math.round(45*Math.pow(1-n/TOPICS.length,1.6))+1+4*Object.keys(damaged).length);
+const dayKey=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 const rankTxt=r=>r>10?`第 ${Math.ceil(r/10)} 頁`:`第 ${r} 名`;
 
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -540,7 +657,7 @@ const controls=new THREE.OrbitControls(camera,cv);
 controls.enableDamping=!reduce;controls.dampingFactor=.08;controls.enablePan=false;
 controls.minDistance=5;controls.maxDistance=44;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.43;
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x9fb3c4,.82));
+const hemi=new THREE.HemisphereLight(0xffffff,0x9fb3c4,.82);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff6e8,.68);
 sun.position.set(-8,15,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
 Object.assign(sun.shadow.camera,{left:-11,right:11,top:11,bottom:-11,near:1,far:45});
@@ -549,10 +666,11 @@ sun.shadow.bias=-.0008;scene.add(sun);
 const waterMat=new THREE.MeshLambertMaterial({color:0xffffff});
 const water=new THREE.Mesh(new THREE.CircleGeometry(90,64),waterMat);
 water.rotation.x=-Math.PI/2;water.position.y=-.02;water.receiveShadow=true;scene.add(water);
+const skyBase=new THREE.Color(),seaBase=new THREE.Color(),STORM_SKY=new THREE.Color('#4E5B6B'),STORM_SEA=new THREE.Color('#3E5466'),WHITE=new THREE.Color(0xffffff);
 function applyTheme(){
-  const sky=new THREE.Color(css('--sky'));
-  scene.background=sky;scene.fog=new THREE.Fog(sky,34,80);
-  waterMat.color.set(css('--sea'));
+  skyBase.set(css('--sky'));seaBase.set(css('--sea'));
+  scene.background=skyBase.clone();scene.fog=new THREE.Fog(skyBase.clone(),34,80);
+  waterMat.color.copy(seaBase);
 }
 applyTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
@@ -828,7 +946,7 @@ for(let i=0;i<34;i++){
 }
 /* shoppers: one more at the door for every lit tile */
 const shoppers=[];
-for(let i=0;i<TOPICS.length;i++)shoppers.push({p:makePerson(),host:shopO,r:.62+rnd()*.25,a:.5+rnd()*2.1,sp:(rnd()>.5?1:-1)*(.00012+rnd()*.00015),i});
+for(let i=0;i<TOPICS.length+ASKS.length;i++)shoppers.push({p:makePerson(),host:shopO,r:.62+rnd()*.25,a:.5+rnd()*2.1,sp:(rnd()>.5?1:-1)*(.00012+rnd()*.00015),i});
 people.push(...shoppers);
 
 /* links */
@@ -885,7 +1003,7 @@ function botStep(){const t=walkers[1].tile.t;const opts=t.links.concat(t.incomin
 const labelsEl=$('labels');
 TOPICS.forEach(t=>{
   const b=el('button','lbl');
-  b.innerHTML=`<span class="no" style="color:${ZONES[t.zone].color}">${t.no}</span>${t.name}<span class="tick">✓</span>`;
+  b.innerHTML=`<span class="no" style="color:${ZONES[t.zone].color}">${t.no}</span>${t.name}<span class="tick">✓</span><span class="warn">⚠ 受損</span>`;
   b.addEventListener('click',()=>select(t.id));
   if(done[t.id])b.classList.add('done');
   labelsEl.appendChild(b);t.label=b;
@@ -914,20 +1032,23 @@ function applyFilter(){
 
 /* progress */
 let toastT;
-function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400);}
+function toast(msg,kind,ms){const t=$('toast');t.textContent=msg;t.className='toast'+(kind?' '+kind:'');t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,ms||2400);}
 function updateProg(){
   const n=litCount(),rk=rankTxt(rankOf(n));
   $('progTxt').textContent=`排名 ${rk}｜點亮 ${n} / ${TOPICS.length}`;
   $('progBar').style.width=(n/TOPICS.length*100)+'%';
   shopName.textContent=(n===TOPICS.length?'👑 ':'')+shop.name;shopRank.textContent=rk;
   crown.visible=n===TOPICS.length;
+  TOPICS.forEach(t=>t.label.classList.toggle('hurt',!!damaged[t.id]));
+  $('dBadge').hidden=daily.last===dayKey(new Date());
 }
 function markDone(id){
   if(done[id])return;done[id]=1;store.set('done',done);
+  const fixed=!!damaged[id];if(fixed){delete damaged[id];store.set('damaged',damaged);}
   const t=byId[id];t.tile.flag.visible=true;t.label.classList.add('done');
   $('sLit').classList.add('show');updateProg();renderList();
   const n=litCount();
-  toast(n===TOPICS.length?`「${shop.name}」衝上第 1 名！`:`點亮「${t.name}」，排名升到${rankTxt(rankOf(n))}`);
+  toast(n===TOPICS.length?`「${shop.name}」衝上第 1 名！`:`${fixed?'修好並':''}點亮「${t.name}」，排名升到${rankTxt(rankOf(n))}`);
   coachEvent('done:'+id);
 }
 
@@ -1083,6 +1204,8 @@ $('bHelp').addEventListener('click',()=>{endCoach();if(touring)endTour();deselec
 /* list */
 function renderList(){
   const lBody=$('lBody');lBody.innerHTML='';
+  const sum=$('dexSum');sum.innerHTML='';
+  [`觀念卡 ${litCount()} / ${TOPICS.length}`,`客人 ${helpedCount()} / ${ASKS.length}`,`連續登入 ${daily.streak||0} 天`].forEach(s=>sum.appendChild(el('span',null,s)));
   Object.entries(ZONES).forEach(([k,z])=>{
     const h=el('h3');h.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.name}`;lBody.appendChild(h);
     TOPICS.filter(t=>t.zone===k).sort((a,b)=>a.no.localeCompare(b.no)).forEach(t=>{
@@ -1092,6 +1215,9 @@ function renderList(){
       lBody.appendChild(b);
     });
   });
+  lBody.appendChild(el('h3',null,'🙋 客人圖鑑'));
+  ASKS.forEach(a=>{const r=el('div','cust'+(helped[a.id]?'':' no'));
+    r.textContent=helped[a.id]?`✓ ${a.who}：「${a.q}」`:'？？？ 還沒幫到這位客人';lBody.appendChild(r);});
 }
 renderList();
 $('bList').addEventListener('click',()=>{listwrap.hidden=false;$('lClose').focus();});
@@ -1103,7 +1229,157 @@ $('sClose').addEventListener('click',deselect);
 addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(!welcome.hidden){welcome.hidden=true;store.set('onboarded',1);}
-  else if(!listwrap.hidden)listwrap.hidden=true;else if(touring){endTour();home();}else if(selected)deselect();
+  else if(!listwrap.hidden)listwrap.hidden=true;
+  else if(!askwrap.hidden){askwrap.hidden=true;if(ask)clearAsk(6000);}
+  else if(!dailywrap.hidden)dailywrap.hidden=true;else if(!sharewrap.hidden)sharewrap.hidden=true;else if(touring){endTour();home();}else if(selected)deselect();
+});
+
+/* modals */
+const askwrap=$('askwrap'),dailywrap=$('dailywrap'),sharewrap=$('sharewrap');
+[[askwrap,'aClose'],[dailywrap,'dClose'],[sharewrap,'shClose']].forEach(([w,c])=>{
+  $(c).addEventListener('click',()=>w.hidden=true);
+  w.addEventListener('click',e=>{if(e.target===w)w.hidden=true;});
+});
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+/* streak blossoms: one per consecutive day, up to 7 */
+const blossoms=decoTiles.slice().sort((a,b)=>a.base.distanceTo(shopBase)-b.base.distanceTo(shopBase)).slice(0,7).map((d,i)=>{
+  const tg=new THREE.Group();cyl(tg,.04,.06,.3,WOOD,0,0,0,6);
+  add(tg,new THREE.SphereGeometry(.24,12,10),'#F7A1C4',0,.42,0);add(tg,new THREE.SphereGeometry(.15,10,8),'#FBC4DA',.14,.5,.08);
+  tg.position.set(i%2?.4:-.4,.67,i%2?-.3:.35);tg.visible=false;d.g.add(tg);return tg;});
+function updateBlossoms(){blossoms.forEach((b,i)=>b.visible=i<Math.min(7,daily.streak||0));}
+updateBlossoms();
+
+/* algorithm typhoon */
+const RAIN=reduce?0:1400,rainPos=new Float32Array(RAIN*3);
+for(let i=0;i<RAIN;i++){rainPos[i*3]=(Math.random()-.5)*30;rainPos[i*3+1]=Math.random()*14;rainPos[i*3+2]=(Math.random()-.5)*30;}
+const rainGeo=new THREE.BufferGeometry();rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0xD6E6F5,size:.07,transparent:true,opacity:.8}));
+rain.visible=false;scene.add(rain);
+let stormAt=null,storming=false,stormF=0,flash=0,lastStTxt='';
+const stEl=$('storm'),stTxt=$('stTxt');
+function startStorm(){
+  if(storming)return;storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
+  if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());
+  toast('🌀 Google 核心更新颱風來襲！沒點亮的格子要小心了','warn',3200);
+  setTimeout(hitStorm,3300);setTimeout(endStorm,7200);
+}
+let stormHit=[];
+function hitStorm(){
+  stormHit=shuffle(TOPICS.filter(t=>!done[t.id]&&!damaged[t.id])).slice(0,3);
+  stormHit.forEach(t=>damaged[t.id]=1);store.set('damaged',damaged);updateProg();
+}
+function endStorm(){
+  storming=false;stEl.classList.remove('live');stormAt=performance.now()+180000;
+  const n=litCount();let msg;
+  if(n===TOPICS.length)msg='整座島都點亮了，颱風一格都吹不壞！';
+  else if(stormHit.length)msg=`颱風吹壞了 ${stormHit.length} 格：${stormHit.map(t=>t.name).join('、')}。排名掉到${rankTxt(rankOf(n))}，點開完成任務就能修好。`;
+  else msg='受損的格子還沒修好，排名一直被拖累！';
+  toast(msg,'warn',6500);
+}
+$('stGo').addEventListener('click',startStorm);
+function stormTick(now){
+  if(stormAt===null){if(welcome.hidden&&coachIdx<0)stormAt=now+60000;else{setSt('🌀 演算法颱風正在形成');return;}}
+  if(storming)return;
+  if(now>=stormAt){if(!welcome.hidden||coachIdx>=0||!askwrap.hidden){stormAt=now+15000;return;}startStorm();return;}
+  const s=Math.ceil((stormAt-now)/1000);setSt(`🌀 颱風 ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} 後抵達`);
+}
+function setSt(t){if(t!==lastStTxt){stTxt.textContent=t;lastStTxt=t;}}
+
+/* searching customers */
+const bubW=el('div','bubw'),bub=el('button','bub');bubW.appendChild(bub);bubW.hidden=true;labelsEl.appendChild(bubW);
+let ask=null,nextAskAt=performance.now()+4000;
+function spawnAsk(now){
+  const pool=ASKS.filter(a=>!helped[a.id]);const a=(pool.length?pool:ASKS)[Math.floor(Math.random()*(pool.length||ASKS.length))];
+  const hosts=people.filter(q=>q.i==null&&q.p.visible);if(!hosts.length){nextAskAt=now+3000;return;}
+  ask={a,q:hosts[Math.floor(Math.random()*hosts.length)],until:now+30000};
+  bub.innerHTML='';bub.append(el('i',null,`🙋 ${a.who}在搜尋`),document.createTextNode(a.q));bubW.hidden=false;
+}
+function clearAsk(delay){ask=null;bubW.hidden=true;nextAskAt=performance.now()+delay;}
+bub.addEventListener('click',()=>{
+  if(!ask)return;const a=ask.a;ask.until=Infinity;
+  $('aWho').textContent=`🙋 ${a.who}在搜尋`;$('aTitle').textContent=`「${a.q}」`;$('aRes').textContent='';
+  const box_=$('aOpts');box_.innerHTML='';
+  const opts=shuffle([a.a,...shuffle(TOPICS.map(t=>t.id).filter(id=>id!==a.a)).slice(0,2)]);
+  opts.forEach(id=>{const t=byId[id],b=el('button','opt',`${t.no} ${t.name}`);
+    b.addEventListener('click',()=>{
+      box_.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x===b)x.classList.add(id===a.a?'right':'wrong');});
+      if(id===a.a){const first=!helped[a.id];helped[a.id]=1;store.set('helped',helped);
+        $('aRes').textContent='答對了！'+a.why;toast(first?`${a.who}走進了「${shop.name}」，收進客人圖鑑！`:`${a.who}又來光顧了！`);renderList();}
+      else $('aRes').textContent=`這格幫不上忙。答案是「${byId[a.a].name}」：${a.why}`;
+      clearAsk(9000);
+    });box_.appendChild(b);});
+  askwrap.hidden=false;
+});
+$('aClose').addEventListener('click',()=>{if(ask)clearAsk(6000);});
+function askTick(now,w,h){
+  if(!ask){if(now>nextAskAt&&welcome.hidden&&coachIdx<0&&!storming)spawnAsk(now);return;}
+  if(now>ask.until){clearAsk(6000);return;}
+  const p=ask.q.p;if(!p.visible){bubW.hidden=true;return;}
+  v.copy(p.position).setY(p.position.y+.4).project(camera);
+  bubW.hidden=v.z>1;
+  bubW.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%) translateY(-6px)`;
+}
+
+/* daily quest */
+function openDaily(){
+  const today=dayKey(new Date()),n=new Date(),idx=Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/864e5)%DAILY.length,d=DAILY[idx];
+  const doneToday=daily.last===today;
+  $('dStreak').textContent=`連續登入 ${daily.streak||0} 天，每多一天，店旁邊就多開一棵櫻花樹（最多 7 棵）。`;
+  $('dQ').textContent=d.q;$('dRes').textContent=doneToday?`今天已經完成了，明天再來！答案是「${d.o[d.a]}」：${d.why}`:'';
+  const box_=$('dOpts');box_.innerHTML='';
+  d.o.forEach((o,i)=>{const b=el('button','opt',o);b.disabled=doneToday;if(doneToday&&i===d.a)b.classList.add('right');
+    b.addEventListener('click',()=>{
+      box_.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===d.a)x.classList.add('right');else if(x===b)x.classList.add('wrong');});
+      const y=new Date();y.setDate(y.getDate()-1);
+      daily.streak=daily.last===dayKey(y)?(daily.streak||0)+1:1;daily.last=today;store.set('daily',daily);
+      $('dRes').textContent=(i===d.a?'答對了！':`答案是「${d.o[d.a]}」。`)+d.why;
+      $('dStreak').textContent=`連續登入 ${daily.streak} 天！`;
+      updateBlossoms();updateProg();renderList();
+      toast(daily.streak<=7?`連續 ${daily.streak} 天，店旁邊開了一棵櫻花樹！`:`連續 ${daily.streak} 天，太強了！`);
+    });box_.appendChild(b);});
+  dailywrap.hidden=false;
+}
+$('bDaily').addEventListener('click',openDaily);
+
+/* share card */
+const FF='"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function wrapText(c,txt,x,y,maxW,lh,maxLines){
+  let line='',lines=[];for(const ch of txt){if(c.measureText(line+ch).width>maxW){lines.push(line);line=ch;}else line+=ch;}lines.push(line);
+  if(lines.length>maxLines){lines=lines.slice(0,maxLines);lines[maxLines-1]=lines[maxLines-1].slice(0,-1)+'…';}
+  lines.forEach((l,i)=>c.fillText(l,x,y+i*lh));
+}
+async function makeCard(){
+  renderer.render(scene,camera);const snap=new Image();snap.src=cv.toDataURL('image/jpeg',.9);
+  await new Promise(r=>{snap.onload=r;snap.onerror=r;});
+  const W_=1080,H_=1350,c=document.createElement('canvas');c.width=W_;c.height=H_;const x=c.getContext('2d');
+  x.fillStyle='#FDD13C';x.fillRect(0,0,W_,H_);
+  const logo=document.querySelector('.brandcard img');if(logo&&logo.complete)x.drawImage(logo,60,52,175,50);
+  x.fillStyle='#1B1F27';x.textAlign='right';x.font=`700 32px ${FF}`;x.fillText('SEO 島｜網站健檢卡',W_-60,88);
+  x.textAlign='left';x.font=`900 84px ${FF}`;wrapText(x,shop.name,60,215,W_-120,90,1);
+  x.font=`500 32px ${FF}`;x.fillStyle='#5A4A10';x.fillText(INDS[shop.ind].name,62,270);
+  x.save();rr(x,60,305,W_-120,560,36);x.clip();x.fillStyle='#DCEAF5';x.fillRect(60,305,W_-120,560);
+  if(snap.width){const s=Math.max((W_-120)/snap.width,560/snap.height),sw=snap.width*s,sh=snap.height*s;x.drawImage(snap,60+(W_-120-sw)/2,305+(560-sh)/2,sw,sh);}
+  x.restore();
+  const n=litCount(),stats=[['搜尋排名',rankTxt(rankOf(n))],['點亮',`${n} / ${TOPICS.length}`],['接待客人',`${helpedCount()} 位`]];
+  stats.forEach(([k,val],i)=>{const bx=60+i*330;x.fillStyle='#FFFFFF';rr(x,bx,895,300,150,28);x.fill();
+    x.fillStyle='#5A6474';x.font=`500 28px ${FF}`;x.fillText(k,bx+28,945);x.fillStyle=i===0?'#1A73E9':'#1B1F27';x.font=`900 48px ${FF}`;x.fillText(val,bx+28,1010);});
+  const miss=TOPICS.filter(t=>!done[t.id]).map(t=>t.name),hurt=TOPICS.filter(t=>damaged[t.id]).length;
+  x.fillStyle='#1B1F27';x.font=`700 34px ${FF}`;
+  x.fillText(miss.length?`還缺 ${miss.length} 格${hurt?`（${hurt} 格被颱風吹壞）`:''}`:'👑 14 格全部點亮，排名第 1！',60,1100);
+  if(miss.length){x.font=`500 30px ${FF}`;x.fillStyle='#3A4250';wrapText(x,miss.join('、'),60,1150,W_-120,44,2);}
+  x.fillStyle='#1A73E9';x.fillRect(0,1240,W_,110);
+  x.fillStyle='#FFFFFF';x.font=`700 34px ${FF}`;x.fillText('你的網站缺哪幾格？免費 SEO 健檢',60,1300);
+  x.font=`500 26px ${FF}`;x.fillText('萬智匯數位行銷 geniushub.cc',60,1336);
+  return c.toDataURL('image/png');
+}
+$('bShare').addEventListener('click',async()=>{
+  const url=await makeCard();$('shImg').src=url;$('shDl').href=url;
+  const sb=$('shShare');sb.hidden=true;
+  try{const blob=await (await fetch(url)).blob();const file=new File([blob],'seo-island.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){sb.hidden=false;sb.onclick=()=>navigator.share({files:[file],title:'SEO 島',text:`我的「${shop.name}」在 SEO 島排${rankTxt(rankOf(litCount()))}`}).catch(()=>{});}}catch(e){}
+  sharewrap.hidden=false;
 });
 
 /* picking */
@@ -1149,20 +1425,33 @@ function frame(now){
     const goal=o.id&&o.id===selected?.38:0;
     o.lift=reduce?goal:o.lift+(goal-o.lift)*.14;
     o.g.position.y=-(1-ease(o.rise))*(o.h+.7)+o.lift;
-    if(o.sg){const gg=done[o.id]?1:0;o.grow=reduce?gg:o.grow+(gg-o.grow)*.08;o.sg.scale.setScalar(.5+.5*o.grow);}
+    if(o.sg){const gg=done[o.id]?1:0;o.grow=reduce?gg:o.grow+(gg-o.grow)*.08;o.sg.scale.setScalar(.5+.5*o.grow);
+      const dg=damaged[o.id]?1:0;o.dmg=reduce?dg:(o.dmg||0)+(dg-(o.dmg||0))*.1;o.sg.rotation.z=o.dmg*.7;o.sg.rotation.x=o.dmg*.25;
+      if(o.dmg>.01&&!reduce)o.g.rotation.z=Math.sin(now/90+o.base.x)*.012*o.dmg;else o.g.rotation.z=0;}
   });
+  /* typhoon look */
+  stormF+=((storming?1:0)-stormF)*(reduce?1:.04);
+  if(storming&&!reduce&&Math.random()<.012)flash=1;flash*=.85;
+  scene.background.copy(skyBase).lerp(STORM_SKY,stormF*.8).lerp(WHITE,flash*.5);scene.fog.color.copy(scene.background);
+  waterMat.color.copy(seaBase).lerp(STORM_SEA,stormF*.7);
+  hemi.intensity=.82-.3*stormF+flash*.8;sun.intensity=.68*(1-.65*stormF);
+  rain.visible=stormF>.05&&RAIN>0;
+  if(rain.visible){for(let i=0;i<RAIN;i++){let y=rainPos[i*3+1]-.28;rainPos[i*3]+=.07;if(y<0){y=14;rainPos[i*3]=(Math.random()-.5)*30;}rainPos[i*3+1]=y;}
+    rainGeo.attributes.position.needsUpdate=true;rain.material.opacity=.8*stormF;}
+  stormTick(now);
   if(!reduce&&crown.visible){crown.rotation.y=now/900;crown.position.y=SY+1.02+Math.sin(now/400)*.04;}
   if(!reduce){
     anims.forEach(f=>f(now));
     boats.forEach(b=>{const a=b.a0+now*b.sp,x=Math.cos(a)*b.rad,z=Math.sin(a)*b.rad;
       const dx=-Math.sin(a)*Math.sign(b.sp),dz=Math.cos(a)*Math.sign(b.sp);
       b.b.position.set(x,.04+Math.sin(now/500+b.a0)*.03,z);b.b.rotation.y=Math.atan2(-dz,dx);});
-    clouds.forEach((c,i)=>{c.position.x+=.004+i*.0008;if(c.position.x>22)c.position.x=-22;});
+    clouds.forEach((c,i)=>{c.position.x+=(.004+i*.0008)*(1+stormF*12);if(c.position.x>22)c.position.x=-22;});
+    boats.forEach(b=>{b.b.rotation.z=Math.sin(now/160+b.a0)*.3*stormF;});
     if(elp>2500&&now-botTimer>2600){botTimer=now;botStep();}
   }else boats.forEach(b=>{const a=b.a0;b.b.position.set(Math.cos(a)*b.rad,.04,Math.sin(a)*b.rad);});
   people.forEach(q=>{
-    if(!reduce)q.a+=q.sp*16;
-    const hb=q.host;q.p.visible=hb.rise>.95&&(q.i==null||q.i<litCount());
+    if(!reduce&&!(ask&&ask.q===q))q.a+=q.sp*16;
+    const hb=q.host;q.p.visible=hb.rise>.95&&(q.i==null||q.i<litCount()+helpedCount());
     q.p.position.set(hb.base.x+Math.cos(q.a)*q.r,hb.g.position.y+hb.h+.07,hb.base.z+Math.sin(q.a)*q.r);
     q.p.rotation.y=-q.a+(q.sp>0?Math.PI:0);
     if(!reduce)q.p.position.y+=Math.abs(Math.sin(now/120+q.a*10))*.02;
@@ -1189,6 +1478,7 @@ function frame(now){
   else{v.copy(shopBase).setY(shopG.position.y+shopO.h+1.55).project(camera);
     shopLbl.classList.toggle('off',v.z>1);
     shopLbl.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%)`;}
+  askTick(now,w,h);
   renderer.render(scene,camera);
 }
 requestAnimationFrame(frame);
