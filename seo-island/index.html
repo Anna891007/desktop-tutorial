@@ -67,8 +67,8 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 .sunset{--g1:#F7A6A0;--g2:#FFC48E;--g3:#FFD9B0}
-.storm{--g1:#5E6878;--g2:#7C8796;--g3:#9AA4B0}
-body.storm,body.sunset{background:linear-gradient(180deg,var(--g1) 0%,var(--g2) 42%,var(--g3) 70%) fixed}
+.stormy{--g1:#5E6878;--g2:#7C8796;--g3:#9AA4B0}
+body.stormy,body.sunset{background:linear-gradient(180deg,var(--g1) 0%,var(--g2) 42%,var(--g3) 70%) fixed}
 .tilt{position:fixed;left:0;right:0;z-index:1;pointer-events:none;-webkit-backdrop-filter:blur(2.2px);backdrop-filter:blur(2.2px)}
 .tilt.t{top:0;height:24%;-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
 .tilt.b{bottom:0;height:22%;-webkit-mask-image:linear-gradient(0deg,#000,transparent);mask-image:linear-gradient(0deg,#000,transparent)}
@@ -282,12 +282,21 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .wcard .skip{margin-top:10px;border:0;background:none;color:#1B1F27;font-size:14.5px;font-weight:500;text-decoration:underline;cursor:pointer;padding:8px}
 
 .toast{
-  position:fixed;z-index:11;left:50%;top:calc(env(safe-area-inset-top,0px) + 16px);transform:translateX(-50%);
-  background:var(--ok);color:#fff;border-radius:18px;padding:11px 20px;font-size:14.5px;font-weight:700;box-shadow:var(--shadow);
-  width:max-content;max-width:calc(100% - 32px);text-align:center;line-height:1.6;
+  position:fixed;z-index:11;left:50%;top:24%;transform:translateX(-50%);
+  background:var(--ok);color:#fff;border-radius:20px;padding:14px 22px;font-size:16px;font-weight:700;box-shadow:0 14px 34px rgba(20,40,80,.3);
+  width:max-content;max-width:min(560px,calc(100% - 32px));text-align:center;line-height:1.65;cursor:pointer;
 }
+.toast.in{animation:tin .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes tin{0%{opacity:0;transform:translate(-50%,14px) scale(.92)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+.rankup.alert{background:#D23F67;color:#fff}.rankup.alert small{color:#FFE3EA}.rankup.alert .hl{color:#FFE08A}
+.rankup.egg{background:#9A7BEA;color:#fff}.rankup.egg small{color:#EFE8FF}
+.bellbtn{border:0;border-radius:999px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:700;padding:7px 13px;box-shadow:0 3px 12px rgba(20,40,80,.12);cursor:pointer}
+.bellbtn b{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:99px;background:#D23F67;color:#fff;font-size:11px;line-height:18px;text-align:center}
+.hudrow{display:flex;gap:8px;flex-wrap:wrap}
+.notes .exi{align-items:flex-start}
+.notes .exi small{display:block;color:var(--ink-soft);font-size:11.5px}
 .toast.warn{background:#2A3242}
-.rankup{position:fixed;z-index:12;left:50%;top:34%;transform:translate(-50%,-50%);background:#FDD13C;color:#1B1F27;border-radius:22px;padding:14px 26px;font-size:24px;font-weight:900;box-shadow:0 14px 34px rgba(20,40,80,.28);text-align:center;pointer-events:none;white-space:nowrap}
+.rankup{position:fixed;z-index:12;left:50%;top:36%;transform:translate(-50%,-50%);cursor:pointer;max-width:calc(100% - 32px);white-space:normal;background:#FDD13C;color:#1B1F27;border-radius:22px;padding:14px 26px;font-size:24px;font-weight:900;box-shadow:0 14px 34px rgba(20,40,80,.28);text-align:center;}
 .rankup .hl{color:#1A73E9}
 .rankup small{display:block;font-size:13.5px;font-weight:700;color:#5A4A10;margin-top:2px}
 .rankup.go{animation:rkup 2s ease forwards}
@@ -448,7 +457,8 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 <div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">排名 第 5 頁｜點亮 0 / 14</span><span class="mini" id="miniSt"></span><button class="hudT" id="hudT" aria-label="收合資訊" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button></div>
 <div class="storm" id="storm" aria-live="polite"><span id="stTxt">🌀 演算法颱風正在形成</span><button id="stGo">提早迎戰</button></div>
 <button class="goal" id="goal" hidden><span id="goalTxt"></span></button>
-<button class="exbtn" id="exBtn" aria-label="這座島的玩法">🧭 玩法</button>
+<div class="hudrow"><button class="exbtn" id="exBtn" aria-label="這座島的玩法">🧭 玩法</button><button class="bellbtn" id="bellBtn" aria-label="通知紀錄">🔔 通知</button></div>
+<div class="expanel notes" id="bellPanel" hidden></div>
 <div class="expanel" id="exPanel" hidden></div>
 </div>
 
@@ -1430,8 +1440,27 @@ function applyFilter(){
 }
 
 /* progress */
-let toastT;
-function toast(msg,kind,ms){const t=$('toast');t.textContent=msg;t.className='toast'+(kind?' '+kind:'');t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,ms||2400);}
+/* notifications: one at a time in a queue, kept in a history panel */
+const nq=[],notes=[];let nqBusy=false,nqT=null,nqCur=null,unread=0;
+const toastEl=$('toast'),popEl=$('rankup');
+function logNote(text,kind){notes.unshift({text,kind,t:Date.now()});if(notes.length>40)notes.length=40;if(kind==='warn'||kind==='alert'||kind==='egg'){unread++;updBell();}}
+function enqueue(it){if(it.key&&nq.some(x=>x.key===it.key))return;if(nq.length>5)nq.splice(0,nq.length-5);
+  if(it.tone==='alert'){nq.unshift(it);if(nqBusy&&nqCur&&nqCur.tone!=='alert'){nqNext();return;}}else nq.push(it);if(!nqBusy)nqNext();}
+function nqNext(){clearTimeout(nqT);toastEl.hidden=true;popEl.hidden=true;const it=nq.shift();nqCur=it;if(!it){nqBusy=false;return;}nqBusy=true;
+  if(it.type==='pop'){popEl.className='rankup'+(it.tone?' '+it.tone:'');popEl.innerHTML='';it.build(popEl);popEl.style.animationDuration=it.ms+'ms';popEl.hidden=false;void popEl.offsetWidth;popEl.classList.add('go');}
+  else{toastEl.textContent=it.msg;toastEl.className='toast'+(it.kind?' '+it.kind:'');toastEl.hidden=false;void toastEl.offsetWidth;toastEl.classList.add('in');}
+  nqT=setTimeout(nqNext,it.ms);}
+function toast(msg,kind,ms){logNote(msg,kind);enqueue({type:'toast',msg,kind,key:msg,ms:Math.max(ms||0,Math.min(7500,Math.max(2800,[...msg].length*85+900)))});}
+function popEvent(title,sub,tone,ms){logNote(title+(sub?'｜'+sub:''),tone==='alert'?'alert':tone==='egg'?'egg':'');
+  enqueue({type:'pop',tone,key:title,ms:ms||3200,build:e=>{e.append(document.createTextNode(title));if(sub)e.appendChild(el('small',null,sub));}});}
+toastEl.addEventListener('click',nqNext);popEl.addEventListener('click',nqNext);
+const bellBtn=$('bellBtn'),bellPanel=$('bellPanel');
+function updBell(){bellBtn.innerHTML='🔔 通知'+(unread?`<b>${unread}</b>`:'');}
+function ago(t){const s=Math.round((Date.now()-t)/1000);return s<60?'剛剛':s<3600?`${Math.floor(s/60)} 分鐘前`:`${Math.floor(s/3600)} 小時前`;}
+bellBtn.addEventListener('click',()=>{bellPanel.hidden=!bellPanel.hidden;$('exPanel').hidden=true;if(bellPanel.hidden)return;unread=0;updBell();
+  bellPanel.innerHTML='';bellPanel.appendChild(el('b','exh','最近的通知'));
+  if(!notes.length)bellPanel.appendChild(el('p','note','還沒有通知。島上發生的事都會記在這裡。'));
+  notes.forEach(n=>{const r=el('div','exi');const x=el('div');x.append(el('span',null,n.text),el('small',null,ago(n.t)));r.appendChild(x);bellPanel.appendChild(r);});});
 function updateProg(){
   const n=litCount(),rk=rankTxt(rankOf(n));
   $('progTxt').textContent=`排名 ${rk}${maint.tasks.length?' ⚔':''}｜點亮 ${n} / ${TOPICS.length}`;
@@ -1640,6 +1669,7 @@ addEventListener('keydown',e=>{
   else if(!lmwrap.hidden)lmwrap.hidden=true;
   else if(!guidewrap.hidden)guidewrap.hidden=true;
   else if(!exPanel.hidden)exPanel.hidden=true;
+  else if(!bellPanel.hidden)bellPanel.hidden=true;
   else if(!dailywrap.hidden)dailywrap.hidden=true;else if(!sharewrap.hidden)sharewrap.hidden=true;else if(touring){endTour();home();}else if(selected)deselect();
 });
 
@@ -1670,7 +1700,7 @@ const stEl=$('storm'),stTxt=$('stTxt');
 function startStorm(){
   if(storming)return;sfx('storm');storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
   if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());
-  toast('🌀 Google 核心更新颱風來襲！沒點亮的格子要小心了','warn',3200);
+  popEvent('🌀 演算法颱風來襲！','Google 核心更新｜沒點亮的格子會被吹壞','alert',3000);
   setTimeout(hitStorm,3300);setTimeout(endStorm,7200);
 }
 let stormHit=[];
@@ -1682,9 +1712,11 @@ function endStorm(){
   storming=false;stEl.classList.remove('live');stormAt=performance.now()+180000;flag('storm');
   const n=litCount();let msg;
   if(n===TOPICS.length)msg='整座島都點亮了，颱風一格都吹不壞！';
-  else if(stormHit.length)msg=`颱風吹壞了 ${stormHit.length} 格：${stormHit.map(t=>t.name).join('、')}。排名掉到${rankTxt(rankOf(n))}，點開完成任務就能修好。`;
+  else if(stormHit.length){popEvent(`💥 ${stormHit.length} 格被吹壞了`,`${stormHit.map(t=>t.name).join('、')}｜排名掉到${rankTxt(rankOf(n))}`,'alert',3800);
+    const o=stormHit[0].tile;flyTo(o.base.clone().setY(o.h),isMobile()?18:13);
+    msg='紅框「⚠ 受損」的格子，點開完成任務就能修好，排名才會回來。';}
   else msg='受損的格子還沒修好，排名一直被拖累！';
-  toast(msg,'warn',6500);
+  toast(msg,'warn');
 }
 $('stGo').addEventListener('click',startStorm);
 function stormTick(now){
@@ -1714,7 +1746,8 @@ bub.addEventListener('click',()=>{
     b.addEventListener('click',()=>{
       box_.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x===b)x.classList.add(id===a.a?'right':'wrong');});
       if(id===a.a){const first=!helped[a.id];helped[a.id]=1;store.set('helped',helped);
-        $('aRes').textContent='答對了！'+a.why;toast(first?`${a.who}走進了「${shop.name}」，收進客人圖鑑！`:`${a.who}又來光顧了！`);renderList();}
+        $('aRes').textContent='答對了！'+a.why;renderList();
+        setTimeout(()=>{askwrap.hidden=true;if(selected)deselect();flyTo(shopBase.clone().setY(shopO.h),isMobile()?13:9);toast(first?`🙋 ${a.who}走進了「${shop.name}」，收進客人圖鑑！`:`🙋 ${a.who}又來光顧了！`);},1500);}
       else $('aRes').textContent=`這格幫不上忙。答案是「${byId[a.a].name}」：${a.why}`;
       clearAsk(9000);
     });box_.appendChild(b);});
@@ -1792,7 +1825,7 @@ $('bShare').addEventListener('click',async()=>{flag('share');
 });
 
 /* landmarks & easter eggs */
-function egg(id){if(eggs[id])return;eggs[id]=1;setTimeout(()=>sfx('egg'),900);store.set('eggs',eggs);setTimeout(()=>toast(`🥚 發現彩蛋：${EGG_NAME[id]}（${Object.keys(eggs).length} / ${EGGS.length}）`,'warn',3200),900);renderList();}
+function egg(id){if(eggs[id])return;eggs[id]=1;setTimeout(()=>sfx('egg'),900);store.set('eggs',eggs);setTimeout(()=>popEvent(`🥚 發現彩蛋：${EGG_NAME[id]}`,`彩蛋 ${Object.keys(eggs).length} / ${EGGS.length}｜圖鑑裡看得到`,'egg',2800),900);renderList();}
 const lmwrap=$('lmwrap'),lmBody=$('lmBody');
 $('lmClose').addEventListener('click',()=>lmwrap.hidden=true);
 lmwrap.addEventListener('click',e=>{if(e.target===lmwrap)lmwrap.hidden=true;});
@@ -1936,7 +1969,7 @@ function goalTick(now){
   if(now-goalT<400)return;goalT=now;
   miniSt.textContent=storming?'🌀 來襲中':stormAt===null?'🌀 形成中':'🌀 '+mmss(stormAt-now);
   const busy=!welcome.hidden||coachIdx>=0||touring;
-  exploreTick();exBtn.hidden=busy;if(busy)exPanel.hidden=true;
+  exploreTick();exBtn.parentElement.hidden=busy;if(busy){exPanel.hidden=true;bellPanel.hidden=true;}
   if(busy){goalEl.hidden=true;return;}
   const g=nextGoal(now);goalAct=g.a||null;goalEl.hidden=false;goalEl.classList.toggle('alert',!!g.alert);
   const html=`${g.t}<small>${g.s}</small>`;
@@ -2002,7 +2035,7 @@ function exploreTick(){
   if(!exKnown||state.some((s,i)=>s!==exKnown[i]))renderExplore();
   exKnown=state;
 }
-exBtn.addEventListener('click',()=>{exPanel.hidden=!exPanel.hidden;if(!exPanel.hidden)renderExplore();});
+exBtn.addEventListener('click',()=>{exPanel.hidden=!exPanel.hidden;bellPanel.hidden=true;if(!exPanel.hidden)renderExplore();});
 exploreTick();
 
 /* game feel: sound, light beam, confetti, rank-up popup */
@@ -2039,11 +2072,11 @@ function celebrate(id){
 }
 function beamTick(now){for(let i=beams.length-1;i>=0;i--){const b=beams[i],k=(now-b.t0)/1300;
   b.m.material.opacity=.5*(1-k);b.m.scale.set(1+k*.6,1,1+k*.6);if(k>=1){scene.remove(b.m);b.m.geometry.dispose();beams.splice(i,1);}}}
-const rkEl=$('rankup');let rkT;
-function rankUp(from,to,extra){rkEl.innerHTML='';
-  if(rankTxt(from)!==rankTxt(to))rkEl.append(document.createTextNode(`排名 ${rankTxt(from)} → `),el('span','hl',rankTxt(to)),el('small',null,extra||'排名上升！'));
-  else rkEl.append(document.createTextNode('往前衝 '),el('span','hl',`${from-to} 名`),document.createTextNode('！'),el('small',null,`${extra||''}｜目前第 ${to} 名（${rankTxt(to)}）`));
-  rkEl.hidden=false;rkEl.classList.remove('go');void rkEl.offsetWidth;rkEl.classList.add('go');clearTimeout(rkT);rkT=setTimeout(()=>rkEl.hidden=true,2000);}
+function rankUp(from,to,extra){const down=to>from;
+  logNote(`排名 ${rankTxt(from)} → ${rankTxt(to)}${extra?'｜'+extra:''}`,down?'alert':'');
+  enqueue({type:'pop',tone:down?'alert':'',ms:3000,build:e=>{
+    if(rankTxt(from)!==rankTxt(to))e.append(document.createTextNode(`排名 ${rankTxt(from)} → `),el('span','hl',rankTxt(to)),el('small',null,extra||(down?'排名下滑了！':'排名上升！')));
+    else e.append(document.createTextNode(down?'被擠下 ':'往前衝 '),el('span','hl',`${Math.abs(from-to)} 名`),document.createTextNode('！'),el('small',null,`${extra||''}｜目前第 ${to} 名（${rankTxt(to)}）`));}});}
 
 /* Halloween: floating 404 ghosts in witch hats */
 const HALLOWEEN=(()=>{const q=new URLSearchParams(location.search);if(q.has('halloween'))return true;const d=new Date(),m=d.getMonth(),dd=d.getDate();return (m===9&&dd>=10)||(m===10&&dd<=2);})();
@@ -2094,7 +2127,7 @@ function spawnMaint(why){
   if(litCount()<3||maint.tasks.length>=3)return false;
   const used_=maint.tasks.map(t=>t.type),pool=Object.keys(MAINT).filter(k=>!used_.includes(k));
   const type=pool[Math.floor(Math.random()*pool.length)];maint.tasks.push({type,t:Date.now()});store.set('maint',maint);updateProg();
-  setTimeout(()=>{toast(`⚔「${rival()}」超車你了！${why||''}完成維護任務「${MAINT[type].name}」就能搶回名次`,'warn',4500);sfx('no');},why?3000:0);return true;}
+  setTimeout(()=>{popEvent(`⚔「${rival()}」超車你了！`,`${why||''}排名掉 3 名｜完成維護任務「${MAINT[type].name}」搶回來`,'alert',3800);sfx('no');},why?3000:0);return true;}
 if(maint.lastDay!==dayKey(new Date())){if(maint.lastDay&&spawnMaint('趁你不在時，'))0;maint.lastDay=dayKey(new Date());store.set('maint',maint);}
 function maintTick(now){if(now>maintNext){maintNext=now+240000;if(welcome.hidden&&coachIdx<0&&!storming)spawnMaint();}}
 function openMaint(){const t=maint.tasks[0];if(!t){toast(`「${rival()}」暫時沒有動作，繼續點亮格子吧`);return;}const M=MAINT[t.type];
@@ -2201,7 +2234,7 @@ function frame(now){
   /* typhoon look */
   stormF+=((storming?1:0)-stormF)*(reduce?1:.04);
   if(storming&&!reduce&&Math.random()<.012)flash=1;flash*=.85;
-  scene.fog.color.copy(skyBase).lerp(STORM_SKY,stormF*.8).lerp(WHITE,flash*.5);document.body.classList.toggle('storm',stormF>.3);flashEl.style.opacity=flash*.35;
+  scene.fog.color.copy(skyBase).lerp(STORM_SKY,stormF*.8).lerp(WHITE,flash*.5);document.body.classList.toggle('stormy',stormF>.3);flashEl.style.opacity=flash*.35;
   waterMat.color.copy(seaBase).lerp(STORM_SEA,stormF*.7);
   hemi.intensity=.58-.2*stormF+flash*.8;sun.intensity=.72*(1-.65*stormF);
   rain.visible=stormF>.05&&RAIN>0;
