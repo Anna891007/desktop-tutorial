@@ -427,9 +427,12 @@ body.cine .dock{opacity:0;pointer-events:none}
   .dock{left:10px;right:10px;gap:6px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
   .dock button{flex-direction:column;gap:2px;padding:9px 4px;font-size:12.5px;border-radius:14px}
   .brandcard .bhint{font-size:10.5px}
-  .coach{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)!important}
+  .coach:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 86px)!important}
+  .coach.top{bottom:auto!important;top:calc(env(safe-area-inset-top,0px) + 10px)!important}
+  .coach.top .person,.coach.top .row{display:none}
+  .coach.top .txt{margin:0}
 }
-.coach{bottom:calc(env(safe-area-inset-bottom,0px) + 90px)}
+.coach:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 90px)}
 @media (max-width:719px){
   .hud .brandcard{padding:7px 12px;gap:8px;border-radius:14px}
   .hud .brandcard img{width:70px}
