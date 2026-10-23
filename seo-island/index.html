@@ -314,6 +314,18 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .dexsum span{background:var(--paper-2);border-radius:99px;padding:5px 11px;font-size:13px;font-weight:500}
 .list .cust{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.6}
 .list .cust.no{color:var(--ink-soft)}
+.lbl.lm.new::after{content:"NEW";margin-left:6px;background:#D23F67;color:#fff;font-size:10px;font-weight:900;border-radius:99px;padding:1px 6px;letter-spacing:.04em}
+.exbtn{border:0;border-radius:999px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:700;padding:7px 13px;box-shadow:0 3px 12px rgba(20,40,80,.12);cursor:pointer}
+.exbtn.all{background:var(--ok-soft);color:var(--ok)}
+.exbtn.flash{animation:gflash .6s ease 2}
+.expanel{width:330px;max-width:100%;max-height:max(220px,calc(100vh - 360px));overflow:auto;background:var(--paper);border-radius:18px;box-shadow:var(--shadow);padding:14px 14px 6px}
+.expanel .exh{display:block;font-size:14px;margin-bottom:6px}
+.expanel .exi{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.5}
+.expanel .exi>div{flex:1}
+.expanel .exi b{display:block;font-size:14px}
+.expanel .exi span{color:var(--ink-soft)}
+.expanel .exi.ok b{color:var(--ok)}
+.expanel .exi .btn{flex:none;padding:8px 12px}
 .lbl.lm{font-size:12.5px;padding:5px 11px;background:rgba(255,255,255,.88);color:#1B1F27;font-weight:700}
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .gcard{border-top:5px solid var(--brand);background:var(--paper-2);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
@@ -362,6 +374,7 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 @media (max-width:719px){
   .hud{left:12px;gap:8px;max-width:calc(100% - 72px)}
   .goal{font-size:12.5px;padding:8px 11px}
+  .expanel{max-height:max(220px,calc(100vh - 250px))}
   .brandcard{left:12px;padding:10px 12px;gap:10px;border-radius:18px}
   .brandcard img{width:96px}
   .brandcard h1{font-size:18px}
@@ -404,6 +417,8 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 <div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">排名 第 5 頁｜點亮 0 / 14</span><span class="mini" id="miniSt"></span><button class="hudT" id="hudT" aria-label="收合資訊" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button></div>
 <div class="storm" id="storm" aria-live="polite"><span id="stTxt">🌀 演算法颱風正在形成</span><button id="stGo">提早迎戰</button></div>
 <button class="goal" id="goal" hidden><span id="goalTxt"></span></button>
+<button class="exbtn" id="exBtn" aria-label="這座島的玩法">🧭 玩法</button>
+<div class="expanel" id="exPanel" hidden></div>
 </div>
 
 <nav class="tools" aria-label="檢視工具">
@@ -1563,6 +1578,7 @@ addEventListener('keydown',e=>{
   else if(!askwrap.hidden){askwrap.hidden=true;if(ask)clearAsk(6000);}
   else if(!lmwrap.hidden)lmwrap.hidden=true;
   else if(!guidewrap.hidden)guidewrap.hidden=true;
+  else if(!exPanel.hidden)exPanel.hidden=true;
   else if(!dailywrap.hidden)dailywrap.hidden=true;else if(!sharewrap.hidden)sharewrap.hidden=true;else if(touring){endTour();home();}else if(selected)deselect();
 });
 
@@ -1602,7 +1618,7 @@ function hitStorm(){
   stormHit.forEach(t=>damaged[t.id]=1);store.set('damaged',damaged);updateProg();
 }
 function endStorm(){
-  storming=false;stEl.classList.remove('live');stormAt=performance.now()+180000;
+  storming=false;stEl.classList.remove('live');stormAt=performance.now()+180000;flag('storm');
   const n=litCount();let msg;
   if(n===TOPICS.length)msg='整座島都點亮了，颱風一格都吹不壞！';
   else if(stormHit.length)msg=`颱風吹壞了 ${stormHit.length} 格：${stormHit.map(t=>t.name).join('、')}。排名掉到${rankTxt(rankOf(n))}，點開完成任務就能修好。`;
@@ -1706,7 +1722,7 @@ async function makeCard(){
   x.font=`500 26px ${FF}`;x.fillText('萬智匯數位行銷 geniushub.cc',60,1336);
   return c.toDataURL('image/png');
 }
-$('bShare').addEventListener('click',async()=>{
+$('bShare').addEventListener('click',async()=>{flag('share');
   const url=await makeCard();$('shImg').src=url;$('shDl').href=url;
   const sb=$('shShare');sb.hidden=true;
   try{const blob=await (await fetch(url)).blob();const file=new File([blob],'seo-island.png',{type:'image/png'});
@@ -1797,7 +1813,7 @@ function nbAct(i){const k=nbInd[i],P=PACKS[k],o=NBS[i];if(selected)deselect();fl
    quiz(b,'你會建議他怎麼做？',P.nb.opts,P.nb.ok,P.nb.why,()=>{nbDone[k]=1;store.set('nbDone',nbDone);updateNB();renderList();
     setTimeout(()=>toast(`${P.icon} ${P.nb.owner}：「${P.nb.thanks}」`,null,3800),700);});});}
 /* landmark labels */
-Object.entries(LM).forEach(([k,L])=>{const b=el('button','lbl lm',L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
+Object.entries(LM).forEach(([k,L])=>{L.key=k;const b=el('button','lbl lm',L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
 NBS.forEach((o,i)=>nbLabels[i]=LM['nb'+i].label);updateNB();
 /* secret: type S-E-O, or tap the island name 3 times */
 let keyBuf='';
@@ -1825,7 +1841,7 @@ function lmTick(now,w,h){
   fireTick();
   if(!reduce)NBS.forEach((o,i)=>{if(o.mark.visible){o.mark.position.y=o.Y+1.05+Math.sin(now/300+i)*.06;o.mark.rotation.y=now/700;}});
   Object.values(LM).forEach(L=>{const p=L.obj.getWorldPosition(v);p.y+=L.y;p.project(camera);
-    L.label.classList.toggle('off',p.z>1);L.label.style.transform=`translate(${(p.x+1)/2*w}px,${(1-p.y)/2*h}px) translate(-50%,-100%)`;});
+    L.label.classList.toggle('off',p.z>1);L.label.classList.toggle('new',!/^nb/.test(L.key)&&!seen[L.key]);L.label.style.transform=`translate(${(p.x+1)/2*w}px,${(1-p.y)/2*h}px) translate(-50%,-100%)`;});
 }
 /* collapsible HUD */
 const hud=$('hud'),hudT=$('hudT'),miniSt=$('miniSt');
@@ -1857,6 +1873,7 @@ function goalTick(now){
   if(now-goalT<400)return;goalT=now;
   miniSt.textContent=storming?'🌀 來襲中':stormAt===null?'🌀 形成中':'🌀 '+mmss(stormAt-now);
   const busy=!welcome.hidden||coachIdx>=0||touring;
+  exploreTick();exBtn.hidden=busy;if(busy)exPanel.hidden=true;
   if(busy){goalEl.hidden=true;return;}
   const g=nextGoal(now);goalAct=g.a||null;goalEl.hidden=false;goalEl.classList.toggle('alert',!!g.alert);
   const html=`${g.t}<small>${g.s}</small>`;
@@ -1890,6 +1907,37 @@ function openGuide(){
   r1.addEventListener('click',replayIntro);r2.addEventListener('click',()=>guidewrap.hidden=true);row.append(r1,r2);b.appendChild(row);
   guidewrap.hidden=false;
 }
+
+/* explore checklist: every way to play, ticked as it is tried */
+const flags=store.get('flags',{});
+function flag(k){if(flags[k])return;flags[k]=1;store.set('flags',flags);}
+const EXPLORE=[
+ {k:'lit',t:'點亮第一格',d:'完成格子裡的小任務，排名往上爬',done:()=>litCount()>0,go:()=>{const id=ORDER.find(i=>!done[i]);if(id)select(id);}},
+ {k:'ask',t:'幫一位搜尋客人',d:'小人頭上冒出問題時，點他的泡泡',done:()=>helpedCount()>0,go:()=>{if(ask&&!bubW.hidden)bub.click();else{nextAskAt=0;toast('🙋 馬上有客人冒出問題，留意小人頭上的泡泡');}}},
+ {k:'storm',t:'撐過一次演算法颱風',d:'沒點亮的格子會被吹壞，完成任務就能修好',done:()=>!!flags.storm,go:()=>startStorm()},
+ {k:'nb',t:'解決鄰居的煩惱',d:'頭上有 ❗ 的老闆需要你的 SEO 建議',done:()=>nbInd.some(k=>nbDone[k]),go:()=>{const i=nbInd.findIndex(k=>!nbDone[k]);runAct('nb'+(i<0?0:i));}},
+ {k:'lm',t:'逛一個台中地標',d:'摩天輪、夜市、歌劇院…點了都有事發生',done:()=>TOURS.some(k=>seen[k]),go:()=>runAct(TOURS.find(k=>!seen[k])||'wheel')},
+ {k:'daily',t:'完成每日任務',d:'每天一題，連續登入店旁會開櫻花樹',done:()=>!!daily.last,go:()=>openDaily()},
+ {k:'egg',t:'找到一個隱藏彩蛋',d:'太陽餅、海盜船、草地上的洞…圖鑑裡有提示',done:()=>['cakes','pirate','caught','elf','bot','fireworks'].some(e=>eggs[e])||Object.keys(gotCakes).length>0,go:()=>{exPanel.hidden=true;$('bList').click();}},
+ {k:'share',t:'產生網站健檢卡',d:'一張圖看出你的店排第幾、還缺哪幾格',done:()=>!!flags.share,go:()=>$('bShare').click()}
+];
+const exBtn=$('exBtn'),exPanel=$('exPanel');let exKnown=null;
+function renderExplore(){
+  const n=EXPLORE.filter(e=>e.done()).length;exBtn.textContent=`🧭 玩法 ${n} / ${EXPLORE.length}`;exBtn.classList.toggle('all',n===EXPLORE.length);
+  exPanel.innerHTML='';exPanel.appendChild(el('b','exh',`這座島可以玩的 ${EXPLORE.length} 件事`));
+  EXPLORE.forEach(e=>{const ok=e.done(),r=el('div','exi'+(ok?' ok':''));
+    const x=el('div');x.append(el('b',null,(ok?'✓ ':'○ ')+e.t),el('span',null,e.d));r.appendChild(x);
+    if(!ok){const g=el('button','btn','試試');g.addEventListener('click',()=>{exPanel.hidden=true;e.go();});r.appendChild(g);}
+    exPanel.appendChild(r);});
+}
+function exploreTick(){
+  const state=EXPLORE.map(e=>e.done());
+  if(exKnown){state.forEach((s,i)=>{if(s&&!exKnown[i]){const n=state.filter(Boolean).length;setTimeout(()=>toast(`🧭 解鎖玩法：${EXPLORE[i].t}（${n} / ${EXPLORE.length}）`,null,2600),1600);exBtn.classList.remove('flash');void exBtn.offsetWidth;exBtn.classList.add('flash');}});}
+  if(!exKnown||state.some((s,i)=>s!==exKnown[i]))renderExplore();
+  exKnown=state;
+}
+exBtn.addEventListener('click',()=>{exPanel.hidden=!exPanel.hidden;if(!exPanel.hidden)renderExplore();});
+exploreTick();
 
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
