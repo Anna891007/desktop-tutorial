@@ -812,8 +812,8 @@ TOPICS.forEach(t=>t.links.forEach(l=>byId[l].incoming.push(t.id)));
 ORDER.forEach((id,i)=>byId[id].no=String(i+1).padStart(2,'0'));
 const $=id=>document.getElementById(id);
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};
-const store={get(k,d){try{const v=localStorage.getItem('seoIsland.'+k);return v?JSON.parse(v):d;}catch(e){return d;}},
-  set(k,v){try{localStorage.setItem('seoIsland.'+k,JSON.stringify(v));}catch(e){}}};
+const store={get(k,d){try{const v=localStorage.getItem('seoIsland.v2.'+k);return v?JSON.parse(v):d;}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem('seoIsland.v2.'+k,JSON.stringify(v));}catch(e){}}};
 const done=store.get('done',{}),checks=store.get('checks',{});
 const INDS={dental:{name:'牙醫診所',color:'#4FA3E3'},food:{name:'餐飲',color:'#F07E5A'},ecom:{name:'電商',color:'#F2AE0C'},b2b:{name:'B2B',color:'#1FA67A'}};
 const shop=Object.assign({name:'晴天牙醫',ind:'dental'},store.get('shop',{}));
