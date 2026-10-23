@@ -313,6 +313,13 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .dexsum span{background:var(--paper-2);border-radius:99px;padding:5px 11px;font-size:13px;font-weight:500}
 .list .cust{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.6}
 .list .cust.no{color:var(--ink-soft)}
+.lbl.lm{font-size:12.5px;padding:5px 11px;background:rgba(255,255,255,.88);color:#1B1F27;font-weight:700}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.gcard{border-top:5px solid var(--brand);background:var(--paper-2);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
+.gcard b{display:block;font-size:14px;color:var(--ink);margin-bottom:3px}
+.gcard.locked{opacity:.55}
+#lmwrap .person{margin-top:10px}
+#lmwrap .person b{display:block;font-size:16px}
 .listwrap{
   position:fixed;inset:0;z-index:8;background:rgba(10,24,48,.45);
   display:flex;align-items:center;justify-content:center;
@@ -441,7 +448,7 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
       <div><b>🏪 經營你的店</b>點亮 14 格 SEO 關鍵，排名從第 5 頁爬上第 1 名</div>
       <div><b>🙋 幫客人找答案</b>小人頭上冒出問題，答對他就走進你的店</div>
       <div><b>🌀 演算法颱風</b>Google 核心更新來襲，沒點亮的格子會被吹壞</div>
-      <div><b>👑 每天回來玩</b>每日任務、圖鑑收集，再分享你的健檢卡</div>
+      <div><b>🗺️ 探索台中離島</b>摩天輪、夜市、歌劇院…還藏著太陽餅和彩蛋</div>
     </div>
     <button class="go" id="wGo">跟 Sorla 一起找原因<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     <button class="skip" id="wSkip">我想自己逛</button>
@@ -477,6 +484,15 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
     <p class="mq" id="dQ"></p>
     <div id="dOpts"></div>
     <p class="mres" id="dRes"></p>
+  </div>
+</div>
+
+<div class="listwrap" id="lmwrap" hidden>
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="lmTitle">
+    <button class="close" id="lmClose" aria-label="關閉">×</button>
+    <h2 id="lmTitle"></h2>
+    <p id="lmSub"></p>
+    <div id="lmBody"></div>
   </div>
 </div>
 
@@ -634,6 +650,26 @@ const done=store.get('done',{}),checks=store.get('checks',{});
 const INDS={dental:{name:'牙醫診所',color:'#4FA3E3'},food:{name:'餐飲',color:'#F07E5A'},ecom:{name:'電商',color:'#F2AE0C'},b2b:{name:'B2B',color:'#1FA67A'}};
 const shop=Object.assign({name:'晴天牙醫',ind:'dental'},store.get('shop',{}));
 if(!INDS[shop.ind])shop.ind='dental';
+const HOUR=(()=>{const h=new URLSearchParams(location.search).get('hour');return h!=null&&h!==''?+h:new Date().getHours();})();
+const SUNSET=HOUR===17,NIGHT=HOUR>=19||HOUR<6;
+const eggs=store.get('eggs',{}),gotCakes=store.get('cakes',{});
+const EGGS=[
+ ['office','萬智匯辦公室','拜訪七期高樓的 20 樓'],
+ ['tv','超簡單行銷電視牆','高樓外牆有一塊大螢幕'],
+ ['wheel','SERP 摩天輪','坐上搜尋結果摩天輪'],
+ ['market','長尾字達人','逛逛夜市的攤位'],
+ ['opera','內容殿堂','參觀白色的歌劇院'],
+ ['village','舊文翻新','幫眷村刷上新油漆'],
+ ['valley','環島導覽','從下沉式湖泊公園出發'],
+ ['sunset','高美夕陽','傍晚 5–6 點去高美濕地'],
+ ['cakes','台中通','島上藏著 7 個金黃色的餅'],
+ ['pirate','拒絕黑帽','遠方偶爾有艘黑帆船'],
+ ['caught','被演算法抓包','跟海盜做生意的下場'],
+ ['elf','404 小精靈','有一格草地看起來怪怪的'],
+ ['bot','我只是來爬一下','對小機器人狂點'],
+ ['fireworks','煙火','在鍵盤上打出這座島的名字']
+];
+const EGG_NAME=Object.fromEntries(EGGS.map(e=>[e[0],e[1]]));
 const damaged=store.get('damaged',{}),helped=store.get('helped',{}),daily=store.get('daily',{last:'',streak:0});
 const litCount=()=>Object.keys(done).length;
 const helpedCount=()=>Object.keys(helped).length;
@@ -655,7 +691,7 @@ const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(36,1,.1,220);
 const controls=new THREE.OrbitControls(camera,cv);
 controls.enableDamping=!reduce;controls.dampingFactor=.08;controls.enablePan=false;
-controls.minDistance=5;controls.maxDistance=44;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.43;
+controls.minDistance=5;controls.maxDistance=60;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.43;
 
 const hemi=new THREE.HemisphereLight(0xffffff,0x9fb3c4,.82);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff6e8,.68);
@@ -669,7 +705,8 @@ water.rotation.x=-Math.PI/2;water.position.y=-.02;water.receiveShadow=true;scene
 const skyBase=new THREE.Color(),seaBase=new THREE.Color(),STORM_SKY=new THREE.Color('#4E5B6B'),STORM_SEA=new THREE.Color('#3E5466'),WHITE=new THREE.Color(0xffffff);
 function applyTheme(){
   skyBase.set(css('--sky'));seaBase.set(css('--sea'));
-  scene.background=skyBase.clone();scene.fog=new THREE.Fog(skyBase.clone(),34,80);
+  if(SUNSET){skyBase.set('#F6C38E');seaBase.set('#E59F6E');sun.color.set('#FFC27A');}
+  scene.background=skyBase.clone();scene.fog=new THREE.Fog(skyBase.clone(),40,110);
   waterMat.color.copy(seaBase);
 }
 applyTheme();
@@ -896,26 +933,176 @@ ring(3).forEach(([q,r])=>{
 });
 allGroups.forEach(o=>{o.delay=120+o.base.length()*110+rnd()*80;});
 
-/* scenery: mountains, islets, boats, clouds */
-[[-13,-19,7,6,'#A9C59B'],[-4,-23,8,7.5,'#BCD3AB'],[6,-20,6.5,5.5,'#A3C095'],[15,-17,6,4.5,'#B5CDA3'],[-20,-12,5,3.8,'#C3D8B2'],[21,-10,4.5,3.4,'#C3D8B2']].forEach(([x,z,r,h,c])=>{
-  const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,7),new THREE.MeshLambertMaterial({color:c,flatShading:true}));
-  m.position.set(x,h/2-.05,z);m.rotation.y=rnd()*3;m.receiveShadow=true;scene.add(m);
-  for(let i=0;i<4;i++){const tg=new THREE.Group();tree(tg,0,0,0,2);const a=rnd()*6.28,d=r*(.55+rnd()*.3);tg.position.set(x+Math.cos(a)*d,h*(1-d/r)-.1,z+Math.sin(a)*d);scene.add(tg);}
+/* scenery: Taichung skyline, landmark islets, boats, clouds */
+const extraPick=[],LM={};
+function clickable(obj,act){obj.traverse(o=>{if(o.isMesh){o.userData.act=act;extraPick.push(o);}});return obj;}
+function hitBox(parent,r,x,y,z,act){const m=new THREE.Mesh(new THREE.SphereGeometry(r,8,6),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));m.position.set(x,y,z);m.userData.act=act;parent.add(m);extraPick.push(m);return m;}
+function canvasTex(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const t=new THREE.CanvasTexture(c);return {c,x:c.getContext('2d'),t};}
+const FONT='"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+
+/* skyline: land strips */
+box(scene,15,.3,7,'#C8D2BE',-12,0,-18);box(scene,17,.3,7,'#C8D2BE',13,0,-19);
+/* Qiqi towers (left) */
+const GLASS=['#A9C4DE','#C3D3E4','#93B3D3','#B7CBE0'];
+[[-17,-18,1.1,3.4],[-15.4,-19.5,1,4.6],[-14,-17.2,1.2,3.8],[-10.6,-19.8,1.1,4.9],[-7.4,-18.6,1.2,3.6],[-6,-20.4,1,4.1],[-16.2,-15.9,.9,2.6],[-8.2,-16.2,.9,2.4]].forEach(([x,z,w,h],i)=>{
+  box(scene,w,h,w,GLASS[i%4],x,.3,z);
+  for(let f=.6;f<h-.2;f+=.55)box(scene,w+.02,.05,w+.02,'#7F9BB8',x,.3+f,z);
+  box(scene,w*.6,.18,w*.6,'#E8EEF4',x,.3+h,z);
 });
+/* GeniusHub office: 20 floors, 20F lit */
+const office=new THREE.Group();office.position.set(-9.6,.3,-15.6);scene.add(office);
+const OH=5.2,FL=OH/20;
+box(office,1.5,OH,1.5,'#9DBFE3',0,0,0);
+for(let f=1;f<20;f++)box(office,1.52,.03,1.52,'#7896B6',0,f*FL,0);
+const litMat=new THREE.MeshBasicMaterial({color:0x5FB0FF});
+box(office,1.54,FL*.8,1.54,litMat,0,19*FL+FL*.1,0);
+box(office,.5,.5,.5,'#E8EEF4',0,OH,0);cyl(office,.02,.02,.7,DARK,0,OH+.5,0,4);
+const sgnT=canvasTex(512,128);
+(function(){const x=sgnT.x;x.fillStyle='#FFFFFF';x.fillRect(0,0,512,128);x.fillStyle='#1A73E9';x.font=`900 64px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('GeniusHub',256,52);x.fillStyle='#5A6474';x.font=`500 30px ${FONT}`;x.fillText('萬智匯數位行銷',256,104);sgnT.t.needsUpdate=true;})();
+const osign=new THREE.Mesh(new THREE.PlaneGeometry(1.4,.35),new THREE.MeshBasicMaterial({map:sgnT.t}));osign.position.set(0,OH+.05+.2,.77);office.add(osign);
+box(office,1.44,.42,.04,DARK,0,OH+.04,.73);
+clickable(office,'office');LM.office={obj:office,y:OH+1.1,name:'🏢 萬智匯 20F',dist:9};
+/* TV wall tower */
+const tvT=new THREE.Group();tvT.position.set(-12.4,.3,-16.6);scene.add(tvT);
+box(tvT,1.7,4.3,1.5,'#B4C8DC',0,0,0);for(let f=.6;f<4.1;f+=.55)box(tvT,1.72,.05,1.52,'#7F9BB8',0,f,0);
+box(tvT,1.5,1.05,.06,DARK,0,2.6,.76);
+const tvC=canvasTex(384,256);
+const tvScreen=new THREE.Mesh(new THREE.PlaneGeometry(1.36,.92),new THREE.MeshBasicMaterial({map:tvC.t}));tvScreen.position.set(0,3.125,.8);tvT.add(tvScreen);
+function drawTV(t){const x=tvC.x,k=Math.floor(t/1200)%3;
+  x.fillStyle=['#1A73E9','#FDD13C','#EE5A7C'][k];x.fillRect(0,0,384,256);
+  x.fillStyle=k===1?'#1B1F27':'#FFFFFF';x.textAlign='center';x.textBaseline='middle';
+  x.font=`900 58px ${FONT}`;x.fillText('超簡單行銷',192,104);x.font=`700 34px ${FONT}`;x.fillText('▶ 點我看影片',192,180);tvC.t.needsUpdate=true;}
+drawTV(0);clickable(tvScreen,'tv');
+/* Dadu plateau (right): long low ridge */
+[[9,-20,5,2.6],[14,-21,6,3.2],[19.5,-19.5,5,2.4]].forEach(([x,z,r,h])=>{
+  const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,8),new THREE.MeshLambertMaterial({color:'#A7C49A',flatShading:true}));
+  m.scale.z=.55;m.position.set(x,.3+h/2-.05,z);m.receiveShadow=true;scene.add(m);
+  for(let i=0;i<3;i++){const tg=new THREE.Group();tree(tg,0,0,0,1.8);tg.position.set(x-r*.5+i*r*.5,.3+h*.35,z+1.1);scene.add(tg);}
+});
+
 function islet(x,z,r,c){const g=new THREE.Group();cyl(g,r,r*1.1,.3,'#DCD3C2',0,0,0,18);cyl(g,r,r,.06,c,0,.3,0,18);g.position.set(x,0,z);scene.add(g);return g;}
-const wi=islet(-8.6,4.8,1.3,GRASS);
-[[-.45,.1],[.5,-.2]].forEach(([x,z],i)=>{
-  cyl(wi,.04,.06,1.6,W,x,.36,z,8);
-  const hub=new THREE.Group();hub.position.set(x,1.96,z+.08);wi.add(hub);
-  for(let k=0;k<3;k++){const b=box(hub,.05,.7,.02,W,0,0,0);b.geometry.translate(0,0,0);const p=new THREE.Group();p.rotation.z=k*2.09;p.add(b);b.position.y=.35;hub.add(p);}
-  anims.push(t=>{hub.rotation.z=t/(500+i*120);});
-});
-const ri=islet(8.4,5.6,1.1,SAND);
-[[0,0,.38],[.45,.2,.26],[-.35,.25,.22]].forEach(([x,z,s])=>add(ri,new THREE.DodecahedronGeometry(s),'#A9ABA4',x,.36+s*.6,z));
-const hi=islet(-2.5,-8.6,.9,GRASS);box(hi,.5,.4,.4,W,0,.36,0);roof(hi,.42,.32,'#F07E5A',0,.76,0);box(hi,.7,.04,.2,WOOD,.6,.1,.5);
+const TOP=.36;
+/* SERP ferris wheel park */
+const wp=islet(10.4,-3.2,1.55,GRASS);
+[-.32,.32].forEach(z=>{[-1,1].forEach(s=>{const l=cyl(wp,.035,.05,2.25,W,s*.45,TOP,z,6);l.rotation.z=s*.2;l.position.x=s*.22;});});
+const wheel=new THREE.Group();wheel.position.set(0,TOP+2.15,0);wp.add(wheel);
+add(wheel,new THREE.TorusGeometry(1,.035,6,30),'#EE5A7C',0,0,.3);add(wheel,new THREE.TorusGeometry(1,.035,6,30),'#EE5A7C',0,0,-.3);
+for(let i=0;i<10;i++){const a=i/10*Math.PI*2,sp=add(wheel,new THREE.CylinderGeometry(.015,.015,1,4),W,Math.cos(a)*.5,Math.sin(a)*.5,0);sp.rotation.z=a+Math.PI/2;}
+cyl(wheel,.08,.08,.7,DARK,0,-.35,0,10).rotation.x=Math.PI/2;
+/* cabin heights: rank 1 at the top, rank 10 at the bottom */
+const CAB_ANG=[90,54,126,18,162,-18,198,-54,234,-90].map(d=>d*Math.PI/180);
+const cabins=CAB_ANG.map((a,i)=>{const c=new THREE.Group();c.position.set(Math.cos(a),Math.sin(a)-.16,0);wheel.add(c);
+  const m=new THREE.MeshLambertMaterial({color:['#7FB6F0','#A7E0C8','#F7C4D8','#FFE08A','#C9B8FF'][i%5]});
+  box(c,.26,.2,.24,m,0,0,0);box(c,.3,.03,.28,'#FFFFFF',0,.2,0);return {c,m,base:m.color.clone()};});
+const myCab=new THREE.Group();wp.add(myCab);box(myCab,.28,.22,.26,'#FDD13C',0,0,0);box(myCab,.32,.03,.3,'#FFFFFF',0,.22,0);
+const myFlag=new THREE.Group();myCab.add(myFlag);cyl(myFlag,.01,.01,.35,DARK,0,.25,0,4);box(myFlag,.18,.1,.01,'#D23F67',.09,.48,0);
+/* roller coaster */
+const coPts=[];for(let i=0;i<=48;i++){const a=i/48*Math.PI*2;coPts.push(new THREE.Vector3(Math.cos(a)*1.25,TOP+.35+Math.sin(a*3)*.25+.25,Math.sin(a)*1.25));}
+const coCurve=new THREE.CatmullRomCurve3(coPts,true);
+add(wp,new THREE.TubeGeometry(coCurve,96,.025,5,true),'#1A73E9',0,0,0);
+for(let i=0;i<12;i++){const p=coCurve.getPoint(i/12);cyl(wp,.012,.012,p.y-TOP,'#5A6474',p.x,TOP,p.z,4);}
+const coCar=add(wp,new THREE.BoxGeometry(.16,.08,.1),'#FDB022',0,0,0);
+clickable(wp,'wheel');LM.wheel={obj:wp,y:3.6,name:'🎡 SERP 摩天輪',dist:10};
+function placeMyCab(){const r=rankOf(litCount());
+  cabins.forEach(k=>k.m.color.copy(k.base));
+  if(r<=10){const k=cabins[r-1];k.m.color.set('#FDD13C');myCab.visible=false;myFlag.parent!==k.c&&k.c.add(myFlag);myFlag.position.set(0,-.02,0);}
+  else{myCab.visible=true;myCab.position.set(1.05,TOP,.75);myCab.add(myFlag);myFlag.position.set(0,0,0);}
+}
+
+/* long-tail night market */
+const nm=islet(-10.4,-2.4,1.6,'#E7DCC6');
+const STALL=['#D23F67','#F2AE0C','#1FA67A','#7C5CE0','#1A73E9'];
+for(let i=0;i<5;i++){const x=-1+i*.5,z=(i%2)*.25-.1;
+  box(nm,.4,.26,.3,W,x,TOP,z);
+  for(let s=0;s<3;s++)box(nm,.14,.04,.36,s%2?W:STALL[i],x-.13+s*.13,TOP+.48,z);
+  [-.17,.17].forEach(dx=>cyl(nm,.012,.012,.48,DARK,x+dx,TOP,z+.15,4));}
+const lantMat=new THREE.MeshBasicMaterial({color:0xFF4D3D});
+for(let i=0;i<9;i++)add(nm,new THREE.SphereGeometry(.055,8,6),lantMat,-1.1+i*.275,TOP+.74+Math.sin(i)*.03,.42);
+box(nm,2.4,.01,.01,DARK,0,TOP+.78,.42);
+clickable(nm,'market');LM.market={obj:nm,y:1.6,name:'🏮 長尾關鍵字夜市',dist:9};
+
+/* opera house: curved white shells with round holes */
+const op=islet(-6.2,-10.8,1.5,'#E6E9EE');
+box(op,1.7,.9,1,W,0,TOP,-.1);
+const shellMat=new THREE.MeshLambertMaterial({color:'#FFFFFF',side:THREE.DoubleSide});
+[-.55,0,.55].forEach((x,i)=>{const s=add(op,new THREE.CylinderGeometry(.3,.3,1.05,16,1,true,0,Math.PI),shellMat,x,TOP+.52,.42);s.rotation.y=-Math.PI/2;
+  const hole=add(op,new THREE.CircleGeometry(.12,14),'#3D4B63',x,TOP+.58+(i%2)*.1,.73);});
+box(op,1.9,.06,1.2,W,0,TOP+1.05,0);
+clickable(op,'opera');LM.opera={obj:op,y:2,name:'🎭 內容殿堂',dist:9};
+
+/* Gaomei wetland: wind turbines + boardwalk */
+const gm=islet(-10.6,6.2,1.45,SAND);
+[[-.6,-.3],[.1,-.55],[.7,-.2]].forEach(([x,z],i)=>{
+  cyl(gm,.035,.05,1.7,W,x,TOP,z,8);
+  const hub=new THREE.Group();hub.position.set(x,TOP+1.7,z+.06);gm.add(hub);
+  for(let k=0;k<3;k++){const p=new THREE.Group();p.rotation.z=k*2.09;const b=box(p,.05,.65,.02,W,0,0,0);hub.add(p);}
+  anims.push(t=>{hub.rotation.z=t/(450+i*90)*(1+stormF*4);});});
+for(let i=0;i<9;i++){const a=i*.35;box(gm,.3,.03,.12,WOOD,Math.sin(a)*.4-.2+i*.12,TOP-.02,.2+i*.14);}
+clickable(gm,'wetland');LM.wetland={obj:gm,y:2.4,name:'🌅 高美濕地',dist:9};
+
+/* rainbow village: old grey houses, repainted after the quiz */
+const rv=islet(9.9,7,1.35,GRASS);
+const RAINBOW=['#F25C8A','#FDB022','#3BB6E8','#7BC74D','#9B6BF2'];
+const houseMats=[];
+[[-.55,-.3],[.15,-.45],[.65,.1],[-.25,.35],[.45,.6]].forEach(([x,z],i)=>{
+  const m=new THREE.MeshLambertMaterial({color:'#A7A9AC'}),r=new THREE.MeshLambertMaterial({color:'#7D8085'});houseMats.push([m,r,i]);
+  box(rv,.36,.28,.3,m,x,TOP,z);roof(rv,.3,.2,r,x,TOP+.28,z);});
+clickable(rv,'village');LM.village={obj:rv,y:1.4,name:'🎨 彩虹眷村',dist:8};
+let repaint=0;
+function paintVillage(k){houseMats.forEach(([m,r,i])=>{m.color.set('#A7A9AC').lerp(new THREE.Color(RAINBOW[i]),k);r.color.set('#7D8085').lerp(new THREE.Color(RAINBOW[(i+2)%5]),k);});}
+
+/* sunken lake park */
+const sv=islet(5.4,-10.6,1.55,GRASS);
+add(sv,new THREE.CylinderGeometry(.95,.8,.08,20),'#CFC6B4',0,TOP-.02,0);
+add(sv,new THREE.CylinderGeometry(.8,.8,.04,20),'#5FA8D8',0,TOP-.03,0);
+const br=add(sv,new THREE.TorusGeometry(.8,.04,6,20,Math.PI),WOOD,0,TOP,0);br.rotation.y=Math.PI/2;
+tree(sv,1.1,TOP,-.5,.9);tree(sv,-1.15,TOP,.3,.8);tree(sv,.9,TOP,.8,.7);
+clickable(sv,'valley');LM.valley={obj:sv,y:1.5,name:'🌳 秋紅谷',dist:9};
+
+/* sun cakes: 7 hidden */
+const CAKE_SPOTS=[[op,.75,TOP,.7],[nm,1.25,TOP,-.6],[gm,.9,TOP,.75],[rv,-.9,TOP,-.6],[sv,-.6,TOP,-1.05],[wp,-1.15,TOP,.55]];
+const cakes=[];
+function makeCake(parent,x,y,z,i){const c=new THREE.Group();c.position.set(x,y,z);parent.add(c);
+  cyl(c,.11,.12,.05,'#E3A447',0,0,0,14);cyl(c,.1,.1,.012,'#C9822E',0,.05,0,14);
+  hitBox(c,.26,0,.05,0,'cake:'+i);cakes.push(c);return c;}
+CAKE_SPOTS.forEach(([p,x,y,z],i)=>makeCake(p,x,y,z,i));
+
+/* pirate ship of black-hat SEO */
+const pirate=new THREE.Group();scene.add(pirate);
+box(pirate,1,.24,.36,'#1E1E24',0,0,0);box(pirate,.3,.18,.34,'#1E1E24',-.4,.24,0);
+cyl(pirate,.025,.025,1.1,'#3A2A20',.1,.24,0,5);
+const psail=add(pirate,new THREE.PlaneGeometry(.6,.55),new THREE.MeshLambertMaterial({color:'#15151A',side:THREE.DoubleSide}),.1,.9,0);psail.rotation.y=Math.PI/2;
+add(pirate,new THREE.SphereGeometry(.07,8,6),'#FFFFFF',.1,.95,.02);
+hitBox(pirate,.75,0,.5,0,'pirate');pirate.visible=false;
+let pirateRun=null,pirateNext=performance.now()+50000;
+
+/* 404 elf hole */
+const holeHost=decoTiles.slice().sort((a,b)=>b.base.distanceTo(shopBase)-a.base.distanceTo(shopBase))[0];
+const hole=add(holeHost.g,new THREE.CircleGeometry(.13,16),'#2A2420',.32,.675,-.2);hole.rotation.x=-Math.PI/2;
+hitBox(holeHost.g,.24,.32,.7,-.2,'elf');
+const elf=new THREE.Group();elf.position.set(.32,.67,-.2);elf.scale.setScalar(.01);elf.visible=false;holeHost.g.add(elf);
+cyl(elf,.05,.07,.14,'#3FAF6A',0,0,0,8);add(elf,new THREE.SphereGeometry(.06,10,8),'#F2D3B5',0,.19,0);
+add(elf,new THREE.ConeGeometry(.06,.16,8),'#2E8B57',0,.3,0);
+let elfPop=0;
+
+/* fireworks */
+const fireworks=[];
+function burst(x,y,z,color){
+  const N=90,pos=new Float32Array(N*3),vel=[];
+  for(let i=0;i<N;i++){pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;const v=new THREE.Vector3().randomDirection?new THREE.Vector3().randomDirection():new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();vel.push(v.multiplyScalar(.05+Math.random()*.04));}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const p=new THREE.Points(g,new THREE.PointsMaterial({color,size:.16,transparent:true,opacity:1,depthWrite:false}));scene.add(p);
+  fireworks.push({p,vel,life:1});
+}
+function fireShow(){if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());const C=['#FDD13C','#EE5A7C','#5FB0FF','#7BC74D','#C9B8FF'];
+  for(let i=0;i<7;i++)setTimeout(()=>burst((Math.random()-.5)*8,5+Math.random()*2.5,(Math.random()-.5)*6,C[i%5]),i*380);}
+function fireTick(){for(let i=fireworks.length-1;i>=0;i--){const f=fireworks[i],a=f.p.geometry.attributes.position;
+  for(let k=0;k<f.vel.length;k++){f.vel[k].y-=.0015;a.array[k*3]+=f.vel[k].x;a.array[k*3+1]+=f.vel[k].y;a.array[k*3+2]+=f.vel[k].z;f.vel[k].multiplyScalar(.97);}
+  a.needsUpdate=true;f.life-=.012;f.p.material.opacity=Math.max(0,f.life);
+  if(f.life<=0){scene.remove(f.p);f.p.geometry.dispose();fireworks.splice(i,1);}}}
 
 const boats=[];
-[[6.6,.00011,BLUE,0],[7.8,-.00008,'#FDB022',2.2],[9.4,.00006,TEAL,4.1]].forEach(([rad,sp,c,a0])=>{
+[[6.4,.00011,BLUE,0],[7.3,-.00008,'#FDB022',2.2],[8.2,.00006,TEAL,4.1]].forEach(([rad,sp,c,a0])=>{
   const b=new THREE.Group();
   box(b,.6,.14,.24,W,0,0,0);box(b,.62,.04,.25,c,0,.1,0);
   cyl(b,.015,.015,.6,DARK,0,.14,0,5);
@@ -1039,6 +1226,7 @@ function updateProg(){
   $('progBar').style.width=(n/TOPICS.length*100)+'%';
   shopName.textContent=(n===TOPICS.length?'👑 ':'')+shop.name;shopRank.textContent=rk;
   crown.visible=n===TOPICS.length;
+  placeMyCab();
   TOPICS.forEach(t=>t.label.classList.toggle('hurt',!!damaged[t.id]));
   $('dBadge').hidden=daily.last===dayKey(new Date());
 }
@@ -1143,7 +1331,7 @@ function flyTo(target,dist){
   if(reduce){camera.position.copy(p1);controls.target.copy(target);return;}
   fly={p0:camera.position.clone(),t0:controls.target.clone(),p1,t1:target.clone(),start:performance.now(),dur:1000};
 }
-const overviewDist=()=>Math.max(19,19*.8/Math.min(.8,innerWidth/innerHeight));
+const overviewDist=()=>Math.max(23,23*.8/Math.min(.8,innerWidth/innerHeight));
 function home(){deselect();if(touring)endTour();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());}
 
 /* tour */
@@ -1205,7 +1393,7 @@ $('bHelp').addEventListener('click',()=>{endCoach();if(touring)endTour();deselec
 function renderList(){
   const lBody=$('lBody');lBody.innerHTML='';
   const sum=$('dexSum');sum.innerHTML='';
-  [`觀念卡 ${litCount()} / ${TOPICS.length}`,`客人 ${helpedCount()} / ${ASKS.length}`,`連續登入 ${daily.streak||0} 天`].forEach(s=>sum.appendChild(el('span',null,s)));
+  [`觀念卡 ${litCount()} / ${TOPICS.length}`,`客人 ${helpedCount()} / ${ASKS.length}`,`彩蛋 ${Object.keys(eggs).length} / ${EGGS.length}`,`太陽餅 ${Object.keys(store.get('cakes',{})).length} / 7`,`連續登入 ${daily.streak||0} 天`].forEach(s=>sum.appendChild(el('span',null,s)));
   Object.entries(ZONES).forEach(([k,z])=>{
     const h=el('h3');h.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.name}`;lBody.appendChild(h);
     TOPICS.filter(t=>t.zone===k).sort((a,b)=>a.no.localeCompare(b.no)).forEach(t=>{
@@ -1218,6 +1406,9 @@ function renderList(){
   lBody.appendChild(el('h3',null,'🙋 客人圖鑑'));
   ASKS.forEach(a=>{const r=el('div','cust'+(helped[a.id]?'':' no'));
     r.textContent=helped[a.id]?`✓ ${a.who}：「${a.q}」`:'？？？ 還沒幫到這位客人';lBody.appendChild(r);});
+  lBody.appendChild(el('h3',null,'🥚 彩蛋'));
+  const E=eggs;
+  EGGS.forEach(([id,name,hint])=>{const r=el('div','cust'+(E[id]?'':' no'));r.textContent=E[id]?`✓ ${name}`:`？？？ 提示：${hint}`;lBody.appendChild(r);});
 }
 renderList();
 $('bList').addEventListener('click',()=>{listwrap.hidden=false;$('lClose').focus();});
@@ -1231,6 +1422,7 @@ addEventListener('keydown',e=>{
   if(!welcome.hidden){welcome.hidden=true;store.set('onboarded',1);}
   else if(!listwrap.hidden)listwrap.hidden=true;
   else if(!askwrap.hidden){askwrap.hidden=true;if(ask)clearAsk(6000);}
+  else if(!lmwrap.hidden)lmwrap.hidden=true;
   else if(!dailywrap.hidden)dailywrap.hidden=true;else if(!sharewrap.hidden)sharewrap.hidden=true;else if(touring){endTour();home();}else if(selected)deselect();
 });
 
@@ -1382,6 +1574,109 @@ $('bShare').addEventListener('click',async()=>{
   sharewrap.hidden=false;
 });
 
+/* landmarks & easter eggs */
+function egg(id){if(eggs[id])return;eggs[id]=1;store.set('eggs',eggs);setTimeout(()=>toast(`🥚 發現彩蛋：${EGG_NAME[id]}（${Object.keys(eggs).length} / ${EGGS.length}）`,'warn',3200),900);renderList();}
+const lmwrap=$('lmwrap'),lmBody=$('lmBody');
+$('lmClose').addEventListener('click',()=>lmwrap.hidden=true);
+lmwrap.addEventListener('click',e=>{if(e.target===lmwrap)lmwrap.hidden=true;});
+function openLM(title,sub,build){$('lmTitle').textContent=title;$('lmSub').textContent=sub||'';lmBody.innerHTML='';build(lmBody);lmwrap.hidden=false;}
+function quiz(host,q,opts,ok,why,onOk){
+  host.appendChild(el('p','mq',q));const res=el('p','mres');
+  opts.forEach((o,i)=>{const b=el('button','opt',o);b.addEventListener('click',()=>{
+    host.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===ok)x.classList.add('right');else if(x===b)x.classList.add('wrong');});
+    res.textContent=(i===ok?'答對了！':'再想想：')+why;if(i===ok&&onOk)onOk();});host.appendChild(b);});
+  host.appendChild(res);
+}
+function flyLM(k){const L=LM[k],t=new THREE.Vector3();L.obj.getWorldPosition(t);t.y+=L.y*.45;
+  const d=isMobile()?L.dist*1.5:L.dist,dir=new THREE.Vector3(-t.x,0,-t.z).normalize();
+  const p1=t.clone().add(dir.multiplyScalar(d*.8)).setY(t.y+d*.55);
+  if(reduce){camera.position.copy(p1);controls.target.copy(t);return;}
+  fly={p0:camera.position.clone(),t0:controls.target.clone(),p1,t1:t,start:performance.now(),dur:1100};}
+const ACTS={
+ office(){flyLM('office');egg('office');
+  openLM('萬智匯數位行銷｜七期 20 樓','示意造型，非實際大樓外觀',b=>{
+   const r=el('div','person');const im=el('img');im.src=document.querySelector('.wcard img.face').src;im.alt='';
+   const t=el('div');t.append(el('p','who2','Sorla 和團隊'),el('b',null,NIGHT?'💡 燈還亮著，大家加班中':'正在幫客戶的網站一格一格點亮'));r.append(im,t);b.appendChild(r);
+   b.appendChild(el('p','mres','你的島還缺哪幾格？我們可以幫你看一次網站，列出最該先補的地方。'));
+   const row=el('div','mrow');const a1=el('a','btn primary','免費 SEO 健檢');a1.href='https://geniushub.cc/contact-us/';a1.target='_blank';a1.rel='noopener';
+   const a2=el('a','btn','看超簡單行銷');a2.href='https://www.youtube.com/@super-simple-marketing';a2.target='_blank';a2.rel='noopener';row.append(a1,a2);b.appendChild(row);});},
+ tv(){egg('tv');toast('📺 前往「超簡單行銷」頻道');window.open('https://www.youtube.com/@super-simple-marketing','_blank','noopener');},
+ wheel(){flyLM('wheel');egg('wheel');const r=rankOf(litCount());
+  openLM('SERP 摩天輪','搜尋結果第 1 頁只有 10 個車廂，越前面坐得越高',b=>{
+   b.appendChild(el('p','mres',r<=10?`「${shop.name}」坐在第 ${r} 號車廂。${r===1?'最高的位置，風景最好！':'再點亮幾格，就能往上爬。'}`:`「${shop.name}」排${rankTxt(r)}，還在摩天輪下面排隊。多數人只看第 1 頁，先擠進前 10 名吧！`));
+   const ol=el('div');for(let i=1;i<=10;i++){const d=el('div','cust'+(i===r?'':' no'));d.textContent=`${i}. ${i===r?'👉 '+shop.name:'別家網站'}`;ol.appendChild(d);}b.appendChild(ol);});},
+ market(){flyLM('market');
+  openLM('長尾關鍵字夜市','每個攤位賣一組關鍵字，越長的字越精準',b=>{
+   [['植牙','搜的人多，但大醫院、連鎖品牌都在搶，很難排上去。'],['台中植牙 費用 分期','搜的人少，但會打這串字的人，幾乎已經準備要做了。'],['植牙 會痛嗎 60歲','問題很具體，一篇好文章就能接住他。']].forEach(([k,d])=>{const r=el('div','cust');r.append(el('b',null,`🏮「${k}」`),el('span',null,d));r.style.flexDirection='column';r.style.gap='2px';b.appendChild(r);});
+   quiz(b,'剛起步的小診所，先搶哪一攤？',['植牙','台中植牙 費用 分期','牙齒'],1,'長尾字競爭小、意圖明確，小網站最容易先拿下，也最容易成交。',()=>egg('market'));});},
+ opera(){flyLM('opera');egg('opera');
+  openLM('內容殿堂','你點亮的觀念卡，都在這裡展出',b=>{
+   const g=el('div','gallery');TOPICS.slice().sort((x,y)=>x.no.localeCompare(y.no)).forEach(t=>{const c=el('div','gcard'+(done[t.id]?'':' locked'));
+    c.style.borderTopColor=ZONES[t.zone].color;c.append(el('b',null,done[t.id]?`${t.no} ${t.name}`:`${t.no} ？？？`),el('span',null,done[t.id]?t.desc:'點亮這格後展出'));g.appendChild(c);});
+   b.appendChild(g);});},
+ wetland(){flyLM('wetland');
+  if(SUNSET){egg('sunset');toast('🌅 你在夕陽時刻來到高美濕地，整座島都變金色了！','warn',4000);}
+  else toast('🌅 高美濕地的夕陽最有名。傍晚 5–6 點再回來，整座島會變成金色。','warn',4200);},
+ village(){flyLM('village');
+  if(eggs.village){toast('🎨 眷村已經刷新完成。舊文章也要定期翻新喔！');return;}
+  openLM('彩虹眷村｜舊文翻新','老房子刷上新油漆，舊文章也能重新被看見',b=>{
+   quiz(b,'一篇 3 年前寫的「植牙費用」文章，排名慢慢往下掉，先做什麼？',['直接刪掉','更新價格與內容，保留原本網址','換一個新網址重新發一篇'],1,'更新過時的資訊、補上新內容，並保留原網址，累積的排名和連結都留得住。',()=>{repaint=performance.now();egg('village');});});},
+ valley(){egg('valley');lmTour();},
+ pirate(){
+  openLM('🏴‍☠️ 黑帽 SEO 海盜船','「嘿，老闆！要不要買 1000 條連結？只要 999 元，保證衝第 1 名！」',b=>{
+   const row=el('div','mrow');const y=el('button','btn','好啊，買！'),n=el('button','btn primary','不要，謝謝');
+   y.addEventListener('click',()=>{lmwrap.hidden=true;egg('caught');toast('🚨 被 Google 抓包了！演算法颱風提早來襲','warn',3000);setTimeout(startStorm,1200);});
+   n.addEventListener('click',()=>{lmwrap.hidden=true;egg('pirate');toast('明智！買來的垃圾連結，可能讓網站被懲罰。');pirateRun&&(pirateRun.flee=true);});
+   row.append(y,n);b.appendChild(row);});},
+ elf(){if(elfPop)return;elfPop=performance.now();elf.visible=true;egg('elf');
+  setTimeout(()=>toast('👾 你找到我了！我是 404 小精靈，住在找不到的頁面裡。網址改了記得做轉址喔！','warn',4500),600);},
+ bot(){const now=performance.now();botClicks=botClicks.filter(t=>now-t<2000);botClicks.push(now);
+  if(botClicks.length>=5){botClicks=[];egg('bot');const un=TOPICS.filter(t=>!done[t.id]);
+   if(un.length){const t=un[Math.floor(Math.random()*un.length)];toast(`🤖 我只是來爬一下～「${t.name}」還沒被好好收錄喔！`,'warn',3500);hop(walkers[1],t.id);}
+   else toast('🤖 每一格都收錄好了，我去休息一下～','warn',3000);}}
+};
+let botClicks=[];
+bot.traverse(o=>{if(o.isMesh){o.userData.act='bot';extraPick.push(o);}});hitBox(bot,.35,0,.25,0,'bot');
+function collectCake(i){const c=cakes[i];if(!c||!c.visible)return;c.visible=false;gotCakes[i]=1;store.set('cakes',gotCakes);
+  const n=Object.keys(gotCakes).length;toast(n>=cakes.length?'🥮 7 個太陽餅全收集！你是「台中通」了':`🥮 撿到太陽餅 ${n} / ${cakes.length}`);if(n>=cakes.length)egg('cakes');}
+/* the 7th cake hides on the main island, behind the shop */
+makeCake(shopG,-.62,SY,-.5,6);
+cakes.forEach((c,i)=>{if(gotCakes[i])c.visible=false;});
+if(eggs.elf){elf.visible=true;elf.scale.setScalar(1);}
+if(eggs.village)paintVillage(1);
+const TOURS=['office','wheel','market','opera','wetland','village','valley'];
+function lmTour(){if(touring)endTour();deselect();let i=0;
+  const step=()=>{if(i>=TOURS.length){home();toast('🗺️ 環島導覽結束！每個地標都可以點喔');return;}const k=TOURS[i++];flyLM(k);toast(LM[k].name,'warn',2000);setTimeout(step,2300);};step();}
+function runAct(a){if(!a)return false;if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
+/* landmark labels */
+Object.entries(LM).forEach(([k,L])=>{const b=el('button','lbl lm',L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
+/* secret: type S-E-O, or tap the island name 3 times */
+let keyBuf='';
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;keyBuf=(keyBuf+e.key.toUpperCase()).slice(-3);if(keyBuf==='SEO'){keyBuf='';fireShow();egg('fireworks');}});
+let taps=[];document.querySelector('.brandcard h1').addEventListener('click',()=>{const n=performance.now();taps=taps.filter(t=>n-t<1200);taps.push(n);if(taps.length>=3){taps=[];fireShow();egg('fireworks');}});
+if(SUNSET)setTimeout(()=>toast('🌅 現在是高美濕地的夕陽時刻，島變成金色了！','warn',3500),2500);
+
+
+/* landmark animation */
+let tvLast=-1;
+function lmTick(now,w,h){
+  if(!reduce){wheel.rotation.z=Math.sin(now/2600)*.06;cabins.forEach(k=>k.c.rotation.z=-wheel.rotation.z);
+    coCurve.getPointAt((now/6000)%1,coCar.position);
+    const tk=Math.floor(now/1200);if(tk!==tvLast){tvLast=tk;drawTV(now);}}
+  litMat.color.setHex(NIGHT?0x8CCBFF:0x5FB0FF);
+  if(repaint){const k=Math.min(1,(now-repaint)/1500);paintVillage(k);if(k>=1)repaint=0;}
+  if(elfPop){const k=Math.min(1,(now-elfPop)/700);elf.scale.setScalar(Math.max(.01,1+Math.sin(k*Math.PI)*.4*(1-k)));if(k>=1)elfPop=0;}
+  /* pirate ship sails past now and then */
+  if(!pirateRun&&now>pirateNext&&!storming){pirateRun={t0:now,dir:Math.random()>.5?1:-1};pirate.visible=true;}
+  if(pirateRun){const k=(now-pirateRun.t0)/(pirateRun.flee?9000:26000);
+    const a=(pirateRun.dir>0?-2.6:-.8)+pirateRun.dir*k*1.8,R=15;
+    pirate.position.set(Math.sin(a)*R,.05+Math.sin(now/500)*.04,Math.cos(a)*R);pirate.rotation.y=a+(pirateRun.dir>0?0:Math.PI);
+    if(pirateRun.flee)pirateRun.t0-=8;
+    if(k>=1){pirate.visible=false;pirateRun=null;pirateNext=now+70000+Math.random()*40000;}}
+  fireTick();
+  Object.values(LM).forEach(L=>{const p=L.obj.getWorldPosition(v);p.y+=L.y;p.project(camera);
+    L.label.classList.toggle('off',p.z>1);L.label.style.transform=`translate(${(p.x+1)/2*w}px,${(1-p.y)/2*h}px) translate(-50%,-100%)`;});
+}
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};fly=null;});
@@ -1390,9 +1685,16 @@ cv.addEventListener('pointerup',e=>{
   const r=cv.getBoundingClientRect();
   ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
   ray.setFromCamera(ptr,camera);
-  const hit=ray.intersectObjects(pickables,false)[0];
-  if(hit)select(hit.object.userData.id);else if(selected&&!touring&&coachIdx<0)deselect();
+  const hit=pickHit();
+  if(hit&&hit.object.userData.act)runAct(hit.object.userData.act);
+  else if(hit)select(hit.object.userData.id);else if(selected&&!touring&&coachIdx<0)deselect();
 });
+const shown=o=>{for(;o;o=o.parent)if(!o.visible)return false;return true;};
+function pickHit(){return ray.intersectObjects(pickables.concat(extraPick),false).find(h=>shown(h.object));}
+let hoverT=0;
+cv.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const n=performance.now();if(n-hoverT<90)return;hoverT=n;
+  const r=cv.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,camera);
+  cv.style.cursor=pickHit()?'pointer':'';});
 
 /* sizing */
 function resize(){
@@ -1406,7 +1708,7 @@ function resize(){
 addEventListener('resize',()=>{if(!sheet.hidden&&!touring)panel=isMobile()?'bottom':'side';resize();});
 
 /* start */
-camera.position.setFromSpherical(new THREE.Spherical(overviewDist(),.68,.3));controls.target.set(0,0,-.2);
+camera.position.setFromSpherical(new THREE.Spherical(overviewDist(),.9,.3));controls.target.set(0,0,-1.5);
 resize();applyFilter();updateLinks();updateProg();
 const startHash=location.hash.slice(1);
 if(byId[startHash])setTimeout(()=>select(startHash),reduce?0:1500);
@@ -1479,6 +1781,7 @@ function frame(now){
     shopLbl.classList.toggle('off',v.z>1);
     shopLbl.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%)`;}
   askTick(now,w,h);
+  lmTick(now,w,h);
   renderer.render(scene,camera);
 }
 requestAnimationFrame(frame);
