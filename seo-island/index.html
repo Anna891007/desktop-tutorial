@@ -348,6 +348,20 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .qz .qzgrid .opt{margin:0;min-height:58px;font-weight:700}
 .qz .qzbig{font-size:44px;font-weight:900;margin:10px 0 0;color:var(--brand)}
 .qz .qzgo{width:100%;margin-top:12px;padding:15px;font-size:17px}
+.cinebar{position:fixed;left:0;right:0;height:0;background:#1B1424;z-index:9;transition:height .45s ease;pointer-events:none}
+.cinebar.top{top:0}.cinebar.bot{bottom:0}
+body.cine .cinebar{height:11vh}
+body.cine .hud,body.cine .tools,body.cine .zones,body.cine #labels,body.cine .coach{opacity:0;pointer-events:none}
+.hud,.tools,.zones,#labels{transition:opacity .35s}
+.cinecap{position:fixed;z-index:10;left:50%;bottom:calc(11vh + 18px);transform:translateX(-50%);margin:0;max-width:calc(100% - 32px);width:max-content;text-align:center;
+  color:#fff;font-size:clamp(17px,2.6vw,24px);font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.55);opacity:0;transition:opacity .3s;pointer-events:none}
+.cinecap.on{opacity:1}
+.cineskip{position:fixed;z-index:10;right:16px;bottom:calc(11vh*.5 - 16px);display:none;border:0;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer}
+body.cine .cineskip{display:block}
+.say{position:fixed;left:0;top:0;z-index:10;max-width:240px;background:#fff;color:#1B1F27;border-radius:16px;padding:9px 13px;font-size:15px;font-weight:700;line-height:1.5;box-shadow:0 8px 20px rgba(20,40,80,.25);pointer-events:none}
+.say::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-8px;border:8px solid transparent;border-top-color:#fff;border-bottom:0}
+.say.pop{animation:sayin .35s cubic-bezier(.2,1.5,.4,1)}
+@keyframes sayin{0%{opacity:0;scale:.6}100%{opacity:1;scale:1}}
 .lbl.hid,.bubw.hid{opacity:0!important;pointer-events:none!important}
 .lbl{transition:opacity .2s}
 .lbl.lm.new::after{content:"NEW";margin-left:6px;background:#D23F67;color:#fff;font-size:10px;font-weight:900;border-radius:99px;padding:1px 6px;letter-spacing:.04em}
@@ -477,6 +491,10 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 </nav>
 
 <div class="zones" id="zones" role="group" aria-label="依類別篩選"></div>
+<div class="cinebar top"></div><div class="cinebar bot"></div>
+<p class="cinecap" id="cineCap"></p>
+<button class="cineskip" id="cineSkip">略過 ▸▸</button>
+<div class="say" id="say" hidden></div>
 <div class="toast" id="toast" hidden></div>
 <div class="rankup" id="rankup" hidden></div>
 
@@ -1438,7 +1456,7 @@ TOPICS.forEach(t=>{
 });
 const shopLbl=el('button','lbl shop');shopLbl.setAttribute('aria-label','你的店');
 const shopName=el('span'),shopRank=el('span','rk');shopLbl.append(shopName,shopRank);
-shopLbl.addEventListener('click',()=>{if(touring)endTour();deselect();flyTo(shopBase.clone().setY(shopO.h),isMobile()?14:10);});
+shopLbl.addEventListener('click',()=>{if(touring)endTour();playCine(shopShots(false));});
 labelsEl.appendChild(shopLbl);
 
 /* zone chips */
@@ -1497,7 +1515,7 @@ function markDone(id){
   $('sLit').classList.add('show');updateProg();renderList();
   const n=litCount();
   logNote(`${fixed?'修好並':''}點亮「${t.name}」`,'');
-  celebrate(id);if(rankOf(n)<r0)setTimeout(()=>rankUp(r0,rankOf(n),n===TOPICS.length?'👑 衝上第 1 名！':`點亮「${t.name}」`),500);
+  celebrate(id);if(n===TOPICS.length)setTimeout(()=>{$('sheet').hidden=true;playCine(crownShots());},1800);if(rankOf(n)<r0)setTimeout(()=>rankUp(r0,rankOf(n),n===TOPICS.length?'👑 衝上第 1 名！':`點亮「${t.name}」`),500);
   coachEvent('done:'+id);
 }
 
@@ -1629,7 +1647,7 @@ function renderCoach(){
   if(s.act==='focus'){const o=byId.kw.tile;flyTo(o.base.clone().setY(o.h),isMobile()?24:17);}
   if(s.wait&&s.wait.startsWith('done:')&&done[s.wait.slice(5)])setTimeout(()=>coachEvent(s.wait),50);
 }
-function startCoach(){welcome.hidden=true;if(touring)endTour();coachIdx=0;renderCoach();$('cNext').focus();}
+function startCoach(){welcome.hidden=true;if(touring)endTour();playCine(shopShots(true),()=>{coachIdx=0;renderCoach();$('cNext').focus();});}
 function endCoach(silent){
   if(coachIdx<0)return;coachIdx=-1;coach.hidden=true;store.set('onboarded',1);
   TOPICS.forEach(t=>t.label.classList.remove('pulse'));
@@ -1718,9 +1736,8 @@ let stormAt=null,storming=false,stormF=0,flash=0,lastStTxt='';
 const stEl=$('storm'),stTxt=$('stTxt');
 function startStorm(){
   if(storming)return;sfx('storm');storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
-  if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());
-  popEvent('🌀 演算法颱風來襲！','Google 核心更新｜沒點亮的格子會被吹壞','alert',3000);
-  setTimeout(hitStorm,3300);setTimeout(endStorm,7200);
+  if(selected)deselect();playCine(stormShots(),()=>flyTo(new THREE.Vector3(0,0,-.2),overviewDist()));
+  setTimeout(()=>{hitStorm();stormCap();},3300);setTimeout(endStorm,7200);
 }
 let stormHit=[];
 function hitStorm(){
@@ -1732,7 +1749,7 @@ function endStorm(){
   const n=litCount();let msg;
   if(n===TOPICS.length)msg='整座島都點亮了，颱風一格都吹不壞！';
   else if(stormHit.length){popEvent(`💥 ${stormHit.length} 格被吹壞了`,`${stormHit.map(t=>t.name).join('、')}｜排名掉到${rankTxt(rankOf(n))}`,'alert',3800);
-    const o=stormHit[0].tile;flyTo(o.base.clone().setY(o.h),isMobile()?18:13);
+
     msg='';}
   else msg='受損的格子還沒修好，排名一直被拖累！';
   if(msg)toast(msg,'warn');
@@ -1766,7 +1783,7 @@ bub.addEventListener('click',()=>{
       box_.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x===b)x.classList.add(id===a.a?'right':'wrong');});
       if(id===a.a){const first=!helped[a.id];helped[a.id]=1;store.set('helped',helped);
         $('aRes').textContent='答對了！'+a.why;renderList();
-        setTimeout(()=>{askwrap.hidden=true;if(selected)deselect();flyTo(shopBase.clone().setY(shopO.h),isMobile()?13:9);toast(first?`🙋 ${a.who}走進了「${shop.name}」，收進客人圖鑑！`:`🙋 ${a.who}又來光顧了！`);},1500);}
+        setTimeout(()=>{askwrap.hidden=true;playCine(walkInShots(a.who));if(first)logNote(`🙋 ${a.who}收進客人圖鑑`,'');},1300);}
       else $('aRes').textContent=`這格幫不上忙。答案是「${byId[a.a].name}」：${a.why}`;
       clearAsk(9000);
     });box_.appendChild(b);});
@@ -1774,7 +1791,7 @@ bub.addEventListener('click',()=>{
 });
 $('aClose').addEventListener('click',()=>{if(ask)clearAsk(6000);});
 function askTick(now,w,h){
-  if(!ask){if(now>nextAskAt&&welcome.hidden&&coachIdx<0&&!storming&&qzwrap.hidden)spawnAsk(now);return;}
+  if(!ask){if(now>nextAskAt&&welcome.hidden&&coachIdx<0&&!storming&&qzwrap.hidden&&!cine)spawnAsk(now);return;}
   if(now>ask.until){clearAsk(6000);return;}
   const p=ask.q.p;if(!p.visible){bubW.hidden=true;return;}
   v.copy(p.position).setY(p.position.y+.4).project(camera);
@@ -1916,7 +1933,7 @@ if(eggs.village)paintVillage(1);
 const TOURS=['office','wheel','market','opera','wetland','village','valley'];
 function lmTour(){if(touring)endTour();deselect();let i=0;
   const step=()=>{if(i>=TOURS.length){home();toast('🗺️ 環島導覽結束！每個地標都可以點喔');return;}const k=TOURS[i++];flyLM(k);toast(LM[k].name,'warn',2000);setTimeout(step,2300);};step();}
-function runAct(a){if(!a)return false;if(a.startsWith('ghost:')){catchGhost(+a.slice(6));return true;}if(/^nb\d$/.test(a)){nbAct(+a[2]);return true;}if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
+function runAct(a){if(!a)return false;if(cine)return true;if(a.startsWith('person:')){personAct(+a.slice(7));return true;}if(a==='sorla'){sorlaAct();return true;}if(a.startsWith('ghost:')){catchGhost(+a.slice(6));return true;}if(/^nb\d$/.test(a)){nbAct(+a[2]);return true;}if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
 /* neighbours are landmarks too */
 NBS.forEach((o,i)=>{clickable(o.g,'nb'+i);LM['nb'+i]={obj:o.g,y:1.55,name:'',dist:6};});
 function nbAct(i){const k=nbInd[i],P=PACKS[k],o=NBS[i];if(selected)deselect();flyTo(o.base.clone().setY(o.h),isMobile()?14:10);
@@ -2196,6 +2213,85 @@ function closeQuiz(){if(qz){clearInterval(qz.iv);qz.done=true;}qz=null;qzwrap.hi
 $('qzClose').addEventListener('click',closeQuiz);
 $('bQuiz').addEventListener('click',openQuiz);
 
+/* cinematic close-ups: letterbox, camera moves, captions, speech */
+let cine=null;
+const capEl=$('cineCap'),sayEl=$('say');
+const sph=(r,phi,th)=>new THREE.Vector3().setFromSpherical(new THREE.Spherical(r,phi,th));
+function playCine(shots,onDone){
+  if(reduce||!shots.length){shots.forEach(s=>s.cap&&logNote(s.cap,''));onDone&&onDone();return;}
+  if(cine)endCine(true);
+  if(selected)deselect();fly=null;setPanel(null);controls.enabled=false;
+  document.body.classList.add('cine');cine={shots,i:0,t0:performance.now(),onDone};showShot();
+}
+function showShot(){const s=cine.shots[cine.i];capEl.textContent=s.cap||'';capEl.classList.toggle('on',!!s.cap);if(s.cap)logNote(s.cap,'');
+  s.at&&s.at();if(s.say)sayAt(s.say.who,s.say.text);else sayEl.hidden=true;}
+function cineTick(now){
+  const s=cine.shots[cine.i];let k=(now-cine.t0)/s.dur;
+  if(k>=1){cine.i++;cine.t0=now;if(cine.i>=cine.shots.length){endCine();return;}showShot();return cineTick(now);}
+  const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,f=s.from,to=s.to||s.from;
+  const tgt=s.target();
+  const off=sph(f[0]+(to[0]-f[0])*e,f[1]+(to[1]-f[1])*e,f[2]+(to[2]-f[2])*e);
+  camera.position.copy(tgt).add(off);controls.target.copy(tgt);camera.lookAt(tgt);
+  if(s.say&&s.say.who)placeSay(s.say.who);
+}
+function endCine(silent){if(!cine)return;const cb=cine.onDone;cine=null;document.body.classList.remove('cine');capEl.classList.remove('on');sayEl.hidden=true;
+  controls.enabled=true;controls.update();if(!silent&&cb)cb();}
+$('cineSkip').addEventListener('click',()=>{if(cine){const c=cine;c.i=c.shots.length-1;c.t0=-1e9;}});
+/* speech bubble anchored over a 3D object */
+function sayAt(obj,text){sayEl.textContent=text;sayEl.hidden=false;sayEl.classList.remove('pop');void sayEl.offsetWidth;sayEl.classList.add('pop');sayEl._o=obj;placeSay(obj);}
+function placeSay(obj){const p=new THREE.Vector3();obj.getWorldPosition(p);p.y+=.42;p.project(camera);
+  sayEl.style.transform=`translate(${(p.x+1)/2*innerWidth}px,${(1-p.y)/2*innerHeight}px) translate(-50%,-100%)`;}
+const worldOf=o=>()=>{const p=new THREE.Vector3();o.getWorldPosition(p);return p;};
+const R_=isMobile()?1.45:1;
+
+/* 1. your shop */
+function shopShots(intro){const r=rankOf(litCount()),n=litCount()+helpedCount(),T=()=>shopBase.clone().setY(shopO.h+.5);
+  return [
+    {dur:2400,target:T,from:[9*R_,.75,-.9],to:[4.2*R_,1.05,-.25],cap:intro?`這是你的店「${shop.name}」`:`🏪「${shop.name}」`},
+    {dur:2600,target:T,from:[4.2*R_,1.05,-.25],to:[3.2*R_,1.15,.55],cap:r>10?`在 Google 排${rankTxt(r)}，門口${n?`只有 ${n} 位客人`:'冷冷清清'}…`:`排第 ${r} 名，已經有 ${n} 位客人上門！`}
+  ];}
+
+/* 2. any little person: follow and hear what they say */
+const CHAT={
+  low:['我搜了半天，都找不到{shop}的網站耶…','Google 第 5 頁？誰會翻到那裡啦。','聽說{shop}不錯，可是網路上查不到資料。'],
+  mid:['剛剛搜尋時有看到{shop}，排在第 {rank} 名！','{shop}的網站好像變好用了。','手機打開{shop}的網站，竟然很快！'],
+  top:['搜尋第一個就是{shop}，直接來了！','網路上評價很好，特地過來的～','Google 地圖上一查就找到了。'],
+  shop:['我是從 Google 找到這家的！','網站上寫得很清楚，我就直接來了。','朋友傳{shop}的網址給我。'],
+  storm:['颱風好大…網站沒事吧？','我的排名被吹走了啦！']
+};
+function chatLine(q){const r=rankOf(litCount());const pool=storming?CHAT.storm:q.i!=null?CHAT.shop:r>20?CHAT.low:r>3?CHAT.mid:CHAT.top;
+  return pool[Math.floor(Math.random()*pool.length)].replace(/\{shop\}/g,`「${shop.name}」`).replace('{rank}',r);}
+people.forEach((q,i)=>{hitBox(q.p,.17,0,.13,0,'person:'+i);});
+function personAct(i){const q=people[i];if(!q||!q.p.visible)return;sfx('tap');const T=()=>{const p=new THREE.Vector3();q.p.getWorldPosition(p);p.y+=.15;return p;};
+  const th=-q.a+Math.PI/2;
+  playCine([{dur:4600,target:T,from:[3.2*R_,1.05,th+.9],to:[1.7*R_,1.2,th+.35],say:{who:q.p,text:chatLine(q)}}]);}
+/* Sorla says a tip */
+const TIPS=['點亮一格，排名就往上爬一點！','颱風來之前，先把重要的格子點亮。','客人頭上冒問題時，記得幫他找答案。','每天回來做每日任務，店旁會開櫻花樹喔。'];
+guide.traverse(o=>{if(o.isMesh){o.userData.act='sorla';extraPick.push(o);}});
+function sorlaAct(){const T=()=>{const p=guide.position.clone();p.y+=.4;return p;};
+  playCine([{dur:4600,target:T,from:[3.4*R_,1.05,guide.rotation.y-.4],to:[2*R_,1.2,guide.rotation.y],say:{who:guide,text:'我是 Sorla！'+TIPS[Math.floor(Math.random()*TIPS.length)]}}]);}
+
+/* 3. typhoon landfall */
+function stormShots(){
+  const hitT=()=>{const t=stormHit[0]?stormHit[0].tile:shopO;return t.base.clone().setY(t.h+.4);};
+  return [
+    {dur:1800,target:()=>new THREE.Vector3(0,0,-.5),from:[30,.55,.8],to:[24,.95,1.4],cap:'🌀 Google 核心更新颱風，登陸了！'},
+    {dur:1500,target:()=>new THREE.Vector3(0,.5,0),from:[24,.95,1.4],to:[12,.85,2.2],cap:'狂風暴雨，正在掃過整座島…'},
+    {dur:2800,target:hitT,from:[6*R_,.9,2.2],to:[3.4*R_,1.05,2.8],at:()=>{},cap:''}
+  ];}
+function stormCap(){const s=cine&&cine.shots[2];if(!s)return;s.cap=stormHit.length?`💥「${stormHit.map(t=>t.name).join('」「')}」被吹倒了！`:`💪 點亮的格子都撐住了！`;}
+
+/* 4. a helped customer walks in */
+function walkInShots(who){const idx=litCount()+helpedCount()-1,q=shoppers[idx]||shoppers[0];
+  const T=()=>{const p=new THREE.Vector3();q.p.getWorldPosition(p);p.y+=.2;return p;};
+  return [{dur:2700,target:T,from:[4*R_,1,.6],to:[2.3*R_,1.1,.3],say:{who:q.p,text:'我找到了，就是這家！'}},
+    {dur:1600,target:()=>shopBase.clone().setY(shopO.h+.5),from:[3*R_,1.1,.3],to:[3.6*R_,1,-.2],cap:`🙋 ${who}走進了「${shop.name}」`}];}
+
+/* 5. crown */
+function crownShots(){const T=()=>{const p=new THREE.Vector3();crown.getWorldPosition(p);return p;};
+  return [{dur:2600,target:T,from:[5*R_,1.15,-1.2],to:[2.2*R_,1.25,.2],cap:`👑「${shop.name}」衝上 Google 第 1 名！`},
+          {dur:2200,target:()=>new THREE.Vector3(0,0,-.2),from:[14,.9,.2],to:[20,.8,.9],cap:'整座島都點亮了！',at:()=>fireShow()}];}
+
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};fly=null;});
@@ -2239,7 +2335,7 @@ function frame(now){
   requestAnimationFrame(frame);
   if(fly){const k=Math.min(1,(now-fly.start)/fly.dur),e=ease(k);
     camera.position.lerpVectors(fly.p0,fly.p1,e);controls.target.lerpVectors(fly.t0,fly.t1,e);if(k>=1)fly=null;}
-  controls.update();
+  if(cine)cineTick(now);else controls.update();
   const elp=now-t0;
   allGroups.forEach(o=>{
     o.rise=reduce?1:Math.min(1,Math.max(0,(elp-o.delay)/650));
