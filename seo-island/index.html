@@ -788,13 +788,18 @@ TOPICS.forEach(t=>t.links.forEach(to=>{
 function makeWalker(kind){
   const w=new THREE.Group();
   if(kind==='guide'){
-    cyl(w,.15,.21,.44,'#26304A',0,0,0,14);
-    box(w,.09,.2,.02,W,0,.22,.155);
-    add(w,new THREE.SphereGeometry(.15,14,10),'#26304A',0,.42,0);
-    add(w,new THREE.SphereGeometry(.16,18,14),'#F2D3B5',0,.66,0);
-    const hair=add(w,new THREE.SphereGeometry(.172,18,14,0,Math.PI*2,0,Math.PI*.55),'#1F1A18',0,.67,-.01);hair.rotation.x=-.25;
-    box(w,.3,.36,.08,'#1F1A18',0,.36,-.11);
-    add(w,new THREE.SphereGeometry(.022,8,6),DARK,-.055,.66,.148);add(w,new THREE.SphereGeometry(.022,8,6),DARK,.055,.66,.148);
+    /* Sorla: black straight shoulder-length hair, blunt bangs, black top */
+    const HAIR='#141112',SKIN='#F4D9C4',TOP='#1C1F27';
+    cyl(w,.15,.21,.44,TOP,0,0,0,14);
+    add(w,new THREE.SphereGeometry(.15,14,10),TOP,0,.42,0);
+    cyl(w,.05,.055,.08,SKIN,0,.47,0,10);
+    add(w,new THREE.SphereGeometry(.155,18,14),SKIN,0,.66,0);
+    add(w,new THREE.SphereGeometry(.17,18,14,0,Math.PI*2,0,Math.PI*.5),HAIR,0,.67,-.012);
+    add(w,new THREE.CylinderGeometry(.168,.168,.065,18,1,false,-1.15,2.3),HAIR,0,.745,0);
+    [-1,1].forEach(s=>box(w,.055,.3,.15,HAIR,s*.142,.42,.005));
+    box(w,.3,.36,.09,HAIR,0,.38,-.1);
+    add(w,new THREE.SphereGeometry(.02,8,6),DARK,-.055,.655,.145);add(w,new THREE.SphereGeometry(.02,8,6),DARK,.055,.655,.145);
+    box(w,.05,.012,.01,'#C45E5E',0,.585,.15);
     w.scale.setScalar(.9);
   }else{
     box(w,.26,.2,.2,'#DDE3EA',0,.06,0);box(w,.2,.14,.16,'#DDE3EA',0,.28,0);
