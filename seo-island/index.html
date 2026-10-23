@@ -337,6 +337,16 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .dexsum span{background:var(--paper-2);border-radius:99px;padding:5px 11px;font-size:13px;font-weight:500}
 .list .cust{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.6}
 .list .cust.no{color:var(--ink-soft)}
+.arcade{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.acard{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:0;border-radius:16px;padding:14px;background:var(--paper-2);cursor:pointer;color:var(--ink)}
+.acard .ai{font-size:30px;line-height:1.1}
+.acard b{font-size:15px}
+.acard span:last-child{font-size:12.5px;color:var(--ink-soft)}
+.acard:hover{outline:2px solid var(--brand)}
+.gmhud{display:flex;justify-content:space-between;font-weight:700;margin:4px 0 8px}
+.gmcv{display:block;margin:0 auto;max-width:100%;border-radius:16px;touch-action:none;user-select:none;-webkit-user-select:none}
+.dogbtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.dogbtns .btn{flex:1;padding:12px 8px}
 .qz .qzt{display:flex;align-items:center;gap:10px;font-weight:700;margin-top:4px}
 .qz .qzs{font-size:22px;color:var(--brand)}
 .qz .qzc{color:#E5533D;font-size:14px}
@@ -482,7 +492,7 @@ body.cine .cineskip{display:block}
   <button class="tool" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg><span>全景</span></button>
   <button class="tool" id="bTour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg><span>路線</span></button>
   <button class="tool" id="bList"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>圖鑑</span></button>
-  <button class="tool" id="bQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>挑戰</span></button>
+  <button class="tool" id="bQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M18 13.5h.01"/></svg><span>遊戲</span></button>
   <button class="tool" id="bDaily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>每日</span><i class="badge" id="dBadge" hidden></i></button>
   <button class="tool" id="bShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>分享</span></button>
   <button class="tool" id="bLinks" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="17" r="2.5"/><circle cx="19" cy="17" r="2.5"/><path d="M6.5 15C9 7 15 7 17.5 15"/></svg><span>連線</span></button>
@@ -600,6 +610,14 @@ body.cine .cineskip{display:block}
     <button class="close" id="gClose" aria-label="關閉">×</button>
     <h2 id="gTitle">島嶼指南</h2>
     <div id="gBody"></div>
+  </div>
+</div>
+
+<div class="listwrap" id="gmwrap" hidden>
+  <div class="list game" role="dialog" aria-modal="true" aria-labelledby="gmTitle">
+    <button class="close" id="gmClose" aria-label="關閉">×</button>
+    <h2 id="gmTitle">🎮 SEO 遊樂場</h2>
+    <div id="gmBody"></div>
   </div>
 </div>
 
@@ -1702,6 +1720,7 @@ addEventListener('keydown',e=>{
   if(!welcome.hidden){welcome.hidden=true;store.set('onboarded',1);}
   else if(!listwrap.hidden)listwrap.hidden=true;
   else if(!askwrap.hidden){askwrap.hidden=true;if(ask)clearAsk(6000);}
+  else if(!gmwrap.hidden){gmStop();gmwrap.hidden=true;}
   else if(!qzwrap.hidden)closeQuiz();
   else if(!lmwrap.hidden)lmwrap.hidden=true;
   else if(!guidewrap.hidden)guidewrap.hidden=true;
@@ -1758,7 +1777,7 @@ $('stGo').addEventListener('click',startStorm);
 function stormTick(now){
   if(stormAt===null){if(welcome.hidden&&coachIdx<0)stormAt=now+60000;else{setSt('🌀 演算法颱風正在形成');return;}}
   if(storming)return;
-  if(now>=stormAt){if(!welcome.hidden||coachIdx>=0||!askwrap.hidden||!qzwrap.hidden){stormAt=now+15000;return;}startStorm();return;}
+  if(now>=stormAt){if(!welcome.hidden||coachIdx>=0||!askwrap.hidden||!qzwrap.hidden||!gmwrap.hidden){stormAt=now+15000;return;}startStorm();return;}
   const s=Math.ceil((stormAt-now)/1000);setSt(`🌀 颱風 ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} 後抵達`);
 }
 function setSt(t){if(t!==lastStTxt){stTxt.textContent=t;lastStTxt=t;}}
@@ -1791,7 +1810,7 @@ bub.addEventListener('click',()=>{
 });
 $('aClose').addEventListener('click',()=>{if(ask)clearAsk(6000);});
 function askTick(now,w,h){
-  if(!ask){if(now>nextAskAt&&welcome.hidden&&coachIdx<0&&!storming&&qzwrap.hidden&&!cine)spawnAsk(now);return;}
+  if(!ask){if(now>nextAskAt&&welcome.hidden&&coachIdx<0&&!storming&&qzwrap.hidden&&gmwrap.hidden&&!cine)spawnAsk(now);return;}
   if(now>ask.until){clearAsk(6000);return;}
   const p=ask.q.p;if(!p.visible){bubW.hidden=true;return;}
   v.copy(p.position).setY(p.position.y+.4).project(camera);
@@ -1933,7 +1952,7 @@ if(eggs.village)paintVillage(1);
 const TOURS=['office','wheel','market','opera','wetland','village','valley'];
 function lmTour(){if(touring)endTour();deselect();let i=0;
   const step=()=>{if(i>=TOURS.length){home();toast('🗺️ 環島導覽結束！每個地標都可以點喔');return;}const k=TOURS[i++];flyLM(k);toast(LM[k].name,'warn',2000);setTimeout(step,2300);};step();}
-function runAct(a){if(!a)return false;if(cine)return true;if(a.startsWith('person:')){personAct(+a.slice(7));return true;}if(a==='sorla'){sorlaAct();return true;}if(a.startsWith('ghost:')){catchGhost(+a.slice(6));return true;}if(/^nb\d$/.test(a)){nbAct(+a[2]);return true;}if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
+function runAct(a){if(!a)return false;if(cine)return true;if(a==='dog'){gmIntro('dog');return true;}if(a.startsWith('person:')){personAct(+a.slice(7));return true;}if(a==='sorla'){sorlaAct();return true;}if(a.startsWith('ghost:')){catchGhost(+a.slice(6));return true;}if(/^nb\d$/.test(a)){nbAct(+a[2]);return true;}if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
 /* neighbours are landmarks too */
 NBS.forEach((o,i)=>{clickable(o.g,'nb'+i);LM['nb'+i]={obj:o.g,y:1.55,name:'',dist:6};});
 function nbAct(i){const k=nbInd[i],P=PACKS[k],o=NBS[i];if(selected)deselect();flyTo(o.base.clone().setY(o.h),isMobile()?14:10);
@@ -2028,7 +2047,7 @@ function openGuide(){
   b.appendChild(k);
   b.appendChild(el('h3',null,'⚡ 島上會發生的事'));
   if(HALLOWEEN){const r_=el('div','gl');r_.append(el('span','i','🎃'));const x=el('div');x.append(el('b',null,'萬聖節限定：幽靈網址'),document.createTextNode('島上飄著 5 隻戴巫師帽的幽靈，點牠們幫忙做 301 轉址'));r_.appendChild(x);b.appendChild(r_);}
-  [['⚔️','對手超車','點亮 3 格後，對手店會不時超車你，完成維護任務才搶得回名次'],['⚡','60 秒快問快答','右邊「挑戰」按鈕，連擊加分、可以一直重玩'],['🙋','客人搜尋泡泡','小人頭上冒出問題，選對格子他就走進你的店'],['🏘️','鄰居的煩惱','島上還有其他行業的店，頭上有 ❗ 的老闆需要你的 SEO 建議'],['🌀','演算法颱風','左上角倒數，時間到會吹壞最多 3 格沒點亮的格子，排名下降'],['🏴‍☠️','黑帽海盜船','偶爾從遠方駛過，點它看看它想賣你什麼'],['🌅','高美夕陽','傍晚 5–6 點進站，整座島會變成金色'],['💡','加班中','晚上進站，萬智匯 20 樓的燈還亮著']].forEach(([i,t,d])=>{
+  [['⚔️','對手超車','點亮 3 格後，對手店會不時超車你，完成維護任務才搶得回名次'],['🎮','SEO 遊樂場','右邊「遊戲」按鈕：快問快答、搶點擊冰淇淋、Googlebot 山道、狂抽關鍵字、吉娃娃小吉'],['🙋','客人搜尋泡泡','小人頭上冒出問題，選對格子他就走進你的店'],['🏘️','鄰居的煩惱','島上還有其他行業的店，頭上有 ❗ 的老闆需要你的 SEO 建議'],['🌀','演算法颱風','左上角倒數，時間到會吹壞最多 3 格沒點亮的格子，排名下降'],['🏴‍☠️','黑帽海盜船','偶爾從遠方駛過，點它看看它想賣你什麼'],['🌅','高美夕陽','傍晚 5–6 點進站，整座島會變成金色'],['💡','加班中','晚上進站，萬智匯 20 樓的燈還亮著']].forEach(([i,t,d])=>{
     const r_=el('div','gl');r_.append(el('span','i',i));const x=el('div');x.append(el('b',null,t),document.createTextNode(d));r_.appendChild(x);b.appendChild(r_);});
   b.appendChild(el('h3',null,'🗺️ 台中地標（點了都有事）'));
   TOURS.forEach(id=>{const L=LM[id];const r_=el('div','gl');const x=el('div');x.append(el('b',null,L.name+(seen[id]?'　✓':'')));r_.appendChild(x);
@@ -2055,6 +2074,7 @@ const EXPLORE=[
  {k:'egg',t:'找到一個隱藏彩蛋',d:'太陽餅、海盜船、草地上的洞…圖鑑裡有提示',done:()=>['cakes','pirate','caught','elf','bot','fireworks'].some(e=>eggs[e])||Object.keys(gotCakes).length>0,go:()=>{exPanel.hidden=true;$('bList').click();}},
  {k:'quiz',t:'挑戰 60 秒快問快答',d:'客人連續丟問題，連擊加分、答錯扣秒',done:()=>!!flags.quiz,go:()=>openQuiz()},
  {k:'rival',t:'擊退一次對手超車',d:`點亮 3 格後，對手會不時超車你`,done:()=>!!flags.rival,go:()=>openMaint()},
+ {k:'game',t:'玩一個小遊戲',d:'冰淇淋、山道、狂抽關鍵字，還有吉娃娃小吉',done:()=>!!flags.game||!!flags.dog,go:()=>openArcade()},
  {k:'share',t:'產生網站健檢卡',d:'一張圖看出你的店排第幾、還缺哪幾格',done:()=>!!flags.share,go:()=>$('bShare').click()}
 ];
 const exBtn=$('exBtn'),exPanel=$('exPanel');let exKnown=null;
@@ -2211,7 +2231,7 @@ function openQuiz(){if(selected)deselect();qz=null;qzBody.innerHTML='';
   const go=el('button','btn primary qzgo','⚡ 開始挑戰');go.addEventListener('click',qzStart);qzBody.appendChild(go);qzwrap.hidden=false;}
 function closeQuiz(){if(qz){clearInterval(qz.iv);qz.done=true;}qz=null;qzwrap.hidden=true;}
 $('qzClose').addEventListener('click',closeQuiz);
-$('bQuiz').addEventListener('click',openQuiz);
+$('bQuiz').addEventListener('click',openArcade);
 
 /* cinematic close-ups: letterbox, camera moves, captions, speech */
 let cine=null;
@@ -2291,6 +2311,198 @@ function walkInShots(who){const idx=litCount()+helpedCount()-1,q=shoppers[idx]||
 function crownShots(){const T=()=>{const p=new THREE.Vector3();crown.getWorldPosition(p);return p;};
   return [{dur:2600,target:T,from:[5*R_,1.15,-1.2],to:[2.2*R_,1.25,.2],cap:`👑「${shop.name}」衝上 Google 第 1 名！`},
           {dur:2200,target:()=>new THREE.Vector3(0,0,-.2),from:[14,.9,.2],to:[20,.8,.9],cap:'整座島都點亮了！',at:()=>fireShow()}];}
+
+/* mini games arcade */
+const gmwrap=$('gmwrap'),gmBody=$('gmBody'),gmTitle=$('gmTitle');let curGame=null;
+const FF2='"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+const KW_GOOD={
+ dental:['植牙費用 台中','植牙 會痛嗎','台中 牙醫 推薦','矯正 價格','洗牙 健保','植牙 分期','兒童牙科 西屯','假牙 多久換'],
+ food:['西屯 拉麵 推薦','拉麵 宵夜','拉麵 外帶','豚骨拉麵 台中','拉麵 停車','拉麵 營業時間','聚餐 拉麵','素食 拉麵'],
+ ecom:['敏感肌 手工皂','手工皂 推薦','無香料 肥皂','手工皂 洗臉','送禮 手工皂','手工皂 保存','冷製皂 差別','嬰兒 手工皂'],
+ b2b:['CNC 小量加工','鋁件 打樣','台中 CNC 代工','不鏽鋼 加工','CNC 報價','加工 交期','車床 代工','精密 零件 加工']};
+const KW_BAD=['買 1000 條連結','關鍵字塞爆頁尾','白字隱藏關鍵字','複製別人文章','免費 iPhone','刷假評論','一天衝第一名','垃圾外鏈包'];
+const GAMES={
+ ice:{name:'🍦 搶點擊冰淇淋',d:'老闆一直耍你！冰淇淋進到圈圈裡才按，搶下客人的「點擊」。',lesson:'標題和描述夠吸引人，客人才會在搜尋結果點下去。',time:25},
+ road:{name:'🏎️ Googlebot 山道',d:'左右拖曳（或方向鍵）讓 Googlebot 沿著山道爬網站，吃連結、閃開 404 坑洞。',lesson:'內部連結就是 Googlebot 的路，路斷了（404）它就爬不下去。',time:0},
+ tissue:{name:'🧻 狂抽關鍵字',d:'往上滑（或點一下）抽出好關鍵字；遇到黑帽招數，往左右滑把它甩掉！',lesson:'好的關鍵字是客人真的會搜的字；黑帽手法只會讓網站被懲罰。',time:20},
+ dog:{name:'🐶 SEO 小吉',d:'吉娃娃小吉住在你的店旁邊。餵牠內容、帶牠散步建連結、幫牠洗澡修錯誤，牠的心情就是你網站的健康度。',lesson:'',time:0}
+};
+function bestOf(k){return store.get('gm_'+k,0);}
+function openArcade(){
+  if(selected)deselect();gmStop();gmTitle.textContent='🎮 SEO 遊樂場';gmBody.innerHTML='';
+  const grid=el('div','arcade');
+  const card=(icon,name,sub,fn)=>{const b=el('button','acard');b.append(el('span','ai',icon),el('b',null,name),el('span',null,sub));b.addEventListener('click',fn);grid.appendChild(b);};
+  card('⚡','60 秒快問快答',`最高 ${store.get('qzBest',0)} 分`,()=>{gmwrap.hidden=true;openQuiz();});
+  card('🍦','搶點擊冰淇淋',`最高 ${bestOf('ice')} 個`,()=>gmIntro('ice'));
+  card('🏎️','Googlebot 山道',`最遠 ${bestOf('road')} 公尺`,()=>gmIntro('road'));
+  card('🧻','狂抽關鍵字',`最高 ${bestOf('tissue')} 分`,()=>gmIntro('tissue'));
+  card('🐶','SEO 小吉',`心情 ${dogMood()}%`,()=>gmIntro('dog'));
+  gmBody.appendChild(grid);gmwrap.hidden=false;flag('arcade');
+}
+function gmIntro(k){const G=GAMES[k];gmStop();gmTitle.textContent=G.name;gmBody.innerHTML='';
+  gmBody.append(el('p','mres',G.d));
+  if(k!=='dog')gmBody.appendChild(el('p','mq',`最高紀錄：${bestOf(k)}${k==='road'?' 公尺':k==='ice'?' 個':' 分'}`));
+  const row=el('div','mrow'),back=el('button','btn','← 遊樂場'),go=el('button','btn primary',k==='dog'?'去看小吉':'▶ 開始');
+  back.addEventListener('click',openArcade);go.addEventListener('click',()=>gmStart(k));row.append(back,go);gmBody.appendChild(row);gmwrap.hidden=false;}
+function gmStop(){if(curGame){cancelAnimationFrame(curGame.raf);removeEventListener('keydown',curGame.kd);removeEventListener('keyup',curGame.ku);curGame=null;}}
+function gmStart(k){
+  gmStop();gmBody.innerHTML='';const top=el('div','gmhud');const sEl=el('b'),tEl=el('span');top.append(sEl,tEl);
+  const cv2=document.createElement('canvas');cv2.className='gmcv';gmBody.append(top,cv2);
+  const W=Math.min(420,gmBody.clientWidth||360),H=Math.round(Math.min(520,innerHeight*.58));
+  const dpr=Math.min(devicePixelRatio,2);cv2.width=W*dpr;cv2.height=H*dpr;cv2.style.height=H+'px';cv2.style.width=W+'px';
+  const x=cv2.getContext('2d');x.scale(dpr,dpr);
+  const G=Object.assign({k,W,H,x,score:0,left:GAMES[k].time,sEl,tEl,cv:cv2,keys:{},t:0},GAME_IMPL[k]);
+  curGame=G;G.init();
+  const pos=e=>{const r=cv2.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+  cv2.addEventListener('pointerdown',e=>{cv2.setPointerCapture(e.pointerId);const [a,b]=pos(e);G.px=a;G.py=b;G.sx=a;G.sy=b;G.down&&G.down(a,b);});
+  cv2.addEventListener('pointermove',e=>{if(e.buttons===0&&e.pointerType==='mouse'&&!G.hover)return;const [a,b]=pos(e);G.px=a;G.py=b;G.move&&G.move(a,b);});
+  cv2.addEventListener('pointerup',e=>{const [a,b]=pos(e);G.up&&G.up(a,b,a-G.sx,b-G.sy);});
+  G.kd=e=>{G.keys[e.key]=1;};G.ku=e=>{G.keys[e.key]=0;};addEventListener('keydown',G.kd);addEventListener('keyup',G.ku);
+  let last=performance.now();
+  const loop=now=>{if(curGame!==G)return;const dt=Math.min(.05,(now-last)/1000);last=now;G.t+=dt;
+    if(G.left>0&&!G.over){G.left-=dt;if(G.left<=0){G.left=0;gmOver(G);}}
+    if(!G.over)G.step(dt);G.draw();G.hud();G.raf=requestAnimationFrame(loop);};
+  G.raf=requestAnimationFrame(loop);
+}
+function gmOver(G,msg){if(G.over)return;G.over=true;const k=G.k,best=Math.max(bestOf(k),G.score),isNew=G.score>=best&&G.score>0;store.set('gm_'+k,best);
+  flag('game');sfx(isNew?'up':'ok');
+  setTimeout(()=>{if(curGame!==G)return;gmStop();gmBody.innerHTML='';
+    gmBody.append(el('p','qzbig',`${G.score}${k==='road'?' 公尺':k==='ice'?' 個':' 分'}`),el('p','mres',(msg?msg+'｜':'')+`最高紀錄 ${best}${isNew?'（新紀錄！）':''}`),el('p','note','💡 '+GAMES[k].lesson));
+    const row=el('div','mrow'),back=el('button','btn','← 遊樂場'),again=el('button','btn primary','再玩一次');
+    back.addEventListener('click',openArcade);again.addEventListener('click',()=>gmStart(k));row.append(back,again);gmBody.appendChild(row);},700);}
+const rr2=(x,a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();};
+const GAME_IMPL={
+ /* Turkish-ice-cream style: the vendor teases, tap when the cone is in your zone */
+ ice:{
+  init(){this.zone={x:this.W/2,y:this.H*.74,r:46};this.cone={x:this.W/2,y:this.H*.4,tx:this.W/2,ty:this.H*.4,flip:0};this.next=.6;this.combo=0;this.fx=[];this.msg='';this.msgT=0;this.speed=1;},
+  pick(){const z=this.zone,W=this.W,H=this.H,r=Math.random();
+    if(r<.38){this.cone.tx=z.x+(Math.random()-.5)*20;this.cone.ty=z.y+(Math.random()-.5)*14;this.fake=Math.random()<.35;this.next=(this.fake?.22:.55)/this.speed;}
+    else{this.cone.tx=W*.15+Math.random()*W*.7;this.cone.ty=H*.25+Math.random()*H*.35;this.fake=false;this.next=(.35+Math.random()*.5)/this.speed;}
+    this.cone.flip=Math.random()<.12?1:0;},
+  step(dt){this.next-=dt;if(this.next<=0)this.pick();const c=this.cone,k=Math.min(1,dt*14*this.speed);c.x+=(c.tx-c.x)*k;c.y+=(c.ty-c.y)*k;
+    this.fx=this.fx.filter(f=>(f.t-=dt)>0);this.msgT-=dt;},
+  down(){const c=this.cone,z=this.zone,inz=Math.hypot(c.x-z.x,c.y-z.y)<z.r;
+    if(inz&&!c.flip){this.score++;this.combo++;this.speed=Math.min(2.4,1+this.score*.07);sfx('ok');this.fx.push({x:c.x,y:c.y,t:.6,s:`+1 點擊！${this.combo>2?' 🔥×'+this.combo:''}`});
+      c.tx=this.W/2;c.ty=-60;this.next=.45;}
+    else{this.combo=0;this.left=Math.max(0,this.left-2);sfx('no');this.msg=c.flip?'冰淇淋是倒的啦！嘿嘿':'嘿嘿～沒拿到！ −2 秒';this.msgT=1;}},
+  draw(){const x=this.x,W=this.W,H=this.H,c=this.cone,z=this.zone;
+    const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#FFD6E2');g.addColorStop(1,'#FFF1D6');x.fillStyle=g;x.fillRect(0,0,W,H);
+    /* stall */x.fillStyle='#E9564B';for(let i=0;i<8;i++){x.fillStyle=i%2?'#fff':'#E9564B';x.fillRect(i*W/8,0,W/8,26);}
+    /* vendor */const vx=W/2,vy=H*.13+10;x.fillStyle='#F6D2B4';x.beginPath();x.arc(vx,vy,26,0,7);x.fill();
+    x.fillStyle='#C8312A';rr2(x,vx-16,vy-46,32,24,5);x.fill();x.fillStyle='#2A2438';x.fillRect(vx+2,vy-50,2,10);
+    x.fillStyle='#2A2438';x.beginPath();x.arc(vx-9,vy-2,3,0,7);x.arc(vx+9,vy-2,3,0,7);x.fill();
+    x.strokeStyle='#2A2438';x.lineWidth=2;x.beginPath();x.arc(vx,vy+6,9,.15*Math.PI,.85*Math.PI);x.stroke();
+    x.fillStyle='#3B2F2F';x.fillRect(vx-14,vy+12,28,4);
+    /* stick */x.strokeStyle='#9A6B3F';x.lineWidth=5;x.beginPath();x.moveTo(vx+20,vy+20);x.lineTo(c.x,c.y-20);x.stroke();
+    /* zone */x.setLineDash([7,6]);x.strokeStyle='#1A73E9';x.lineWidth=3;x.beginPath();x.arc(z.x,z.y,z.r,0,7);x.stroke();x.setLineDash([]);
+    x.fillStyle='#1A73E9';x.font=`700 13px ${FF2}`;x.textAlign='center';x.fillText('你的點擊區',z.x,z.y+z.r+18);
+    /* hand */x.fillStyle='#F6D2B4';rr2(x,z.x-16,z.y+z.r+26,32,40,12);x.fill();
+    /* cone */x.save();x.translate(c.x,c.y);if(c.flip)x.rotate(Math.PI);
+    x.fillStyle='#E7A95A';x.beginPath();x.moveTo(-15,-4);x.lineTo(15,-4);x.lineTo(0,30);x.closePath();x.fill();
+    x.fillStyle='#FFF4E8';x.beginPath();x.arc(0,-14,17,0,7);x.fill();x.fillStyle='#F7A1C4';x.beginPath();x.arc(-5,-24,10,0,7);x.fill();
+    x.fillStyle='#1A73E9';x.font=`900 11px ${FF2}`;x.fillText('點擊',0,-11);x.restore();
+    this.fx.forEach(f=>{x.globalAlpha=Math.min(1,f.t*2);x.fillStyle='#14866A';x.font=`900 20px ${FF2}`;x.fillText(f.s,f.x,f.y-(.6-f.t)*60);});x.globalAlpha=1;
+    if(this.msgT>0){x.fillStyle='rgba(42,36,56,.85)';rr2(x,W/2-120,H*.5-22,240,40,14);x.fill();x.fillStyle='#fff';x.font=`700 15px ${FF2}`;x.fillText(this.msg,W/2,H*.5+4);}},
+  hud(){this.sEl.textContent=`🍦 ${this.score} 個點擊`;this.tEl.textContent=`${Math.ceil(this.left)} 秒`;}
+ },
+ /* touge style: winding mountain road, steer the bot */
+ road:{
+  init(){this.s=0;this.v=170;this.carX=this.W/2;this.lives=3;this.inv=0;this.items=[];this.spawn=0;this.coins=0;this.ph=Math.random()*9;this.trail=[];this.hover=true;},
+  cx(y){const w=this.s-y;return this.W/2+Math.sin(w*.0042+this.ph)*this.W*.24+Math.sin(w*.011)*this.W*.08;},
+  rw(){return Math.max(this.W*.26,this.W*.44-this.s*.002);},
+  step(dt){const W=this.W,H=this.H;this.v=Math.min(420,170+this.s*.03);this.s+=this.v*dt;
+    if(this.keys.ArrowLeft)this.carX-=260*dt;if(this.keys.ArrowRight)this.carX+=260*dt;
+    if(this.px!=null&&!this.keys.ArrowLeft&&!this.keys.ArrowRight)this.carX+=(this.px-this.carX)*Math.min(1,dt*10);
+    this.carX=Math.max(10,Math.min(W-10,this.carX));
+    const cy=H*.78;this.inv-=dt;
+    if(Math.abs(this.carX-this.cx(cy))>this.rw()/2-8&&this.inv<=0)this.hit('衝出山道了！');
+    this.spawn-=dt;if(this.spawn<=0){this.spawn=.45+Math.random()*.4;const y=-30,bad=Math.random()<.3+Math.min(.25,this.s/20000);
+      this.items.push({wy:this.s-y,off:(Math.random()-.5)*(this.rw()-40),bad});}
+    this.items=this.items.filter(it=>{const y=this.s-it.wy;it.y=y;it.x=this.cx(y)+it.off;
+      if(!it.got&&Math.abs(y-cy)<20&&Math.abs(it.x-this.carX)<22){it.got=1;if(it.bad){if(this.inv<=0)this.hit('掉進 404 坑洞！');}else{this.coins++;sfx('coin');}}
+      return y<H+40&&!(it.got&&!it.bad);});
+    this.score=Math.floor(this.s/10)+this.coins*20;},
+  hit(m){this.lives--;this.inv=1.3;sfx('no');this.msg=m;this.msgT=1;if(this.lives<=0)gmOver(this,m);},
+  draw(){const x=this.x,W=this.W,H=this.H;x.fillStyle='#A9D99A';x.fillRect(0,0,W,H);
+    for(let i=0;i<14;i++){const ty=((i*97+this.s*.9)%(H+60))-30,tx=(i*53)%W;x.fillStyle='#7FC28A';x.beginPath();x.arc(tx,ty,12,0,7);x.fill();}
+    const rw=this.rw();x.fillStyle='#F6E7D2';x.beginPath();
+    for(let y=-10;y<=H+10;y+=10)x.lineTo(this.cx(y)-rw/2,y);for(let y=H+10;y>=-10;y-=10)x.lineTo(this.cx(y)+rw/2,y);x.fill();
+    x.strokeStyle='#E9564B';x.lineWidth=4;x.setLineDash([12,10]);x.lineDashOffset=-this.s;
+    [-1,1].forEach(sd=>{x.beginPath();for(let y=-10;y<=H+10;y+=10)x.lineTo(this.cx(y)+sd*rw/2,y);x.stroke();});x.setLineDash([]);
+    this.items.forEach(it=>{if(it.bad){x.fillStyle='#2A2438';x.beginPath();x.ellipse(it.x,it.y,17,11,0,0,7);x.fill();x.fillStyle='#fff';x.font=`900 10px ${FF2}`;x.textAlign='center';x.fillText('404',it.x,it.y+4);}
+      else{x.fillStyle='#FDD13C';x.beginPath();x.arc(it.x,it.y,11,0,7);x.fill();x.fillStyle='#1A73E9';x.font=`900 12px ${FF2}`;x.textAlign='center';x.fillText('🔗',it.x,it.y+4);}});
+    const cy=H*.78,cx=this.carX;if(this.inv>0&&Math.floor(this.t*12)%2)x.globalAlpha=.4;
+    x.fillStyle='#DDE3EA';rr2(x,cx-14,cy-16,28,28,7);x.fill();x.fillStyle='#4F8FEA';x.fillRect(cx-9,cy-10,18,5);
+    x.fillStyle='#2A2438';x.fillRect(cx-17,cy-12,4,10);x.fillRect(cx+13,cy-12,4,10);x.fillRect(cx-17,cy+2,4,10);x.fillRect(cx+13,cy+2,4,10);
+    x.fillStyle='#F2789A';x.beginPath();x.arc(cx,cy-22,4,0,7);x.fill();x.globalAlpha=1;
+    if(this.msgT>0){this.msgT-=.016;x.fillStyle='rgba(42,36,56,.85)';rr2(x,W/2-110,H*.4-20,220,38,14);x.fill();x.fillStyle='#fff';x.font=`700 15px ${FF2}`;x.textAlign='center';x.fillText(this.msg,W/2,H*.4+5);}},
+  hud(){this.sEl.textContent=`🏎️ ${Math.floor(this.s/10)} 公尺｜🔗 ${this.coins}`;this.tEl.textContent='❤️'.repeat(Math.max(0,this.lives));}
+ },
+ /* tissue rush: swipe up good keywords, swipe away black-hat ones */
+ tissue:{
+  init(){this.cur=null;this.fly=[];this.combo=0;this.msgT=0;this.newT();},
+  newT(){const bad=Math.random()<.3,good=KW_GOOD[shop.ind]||KW_GOOD.dental;this.cur={txt:bad?KW_BAD[Math.floor(Math.random()*KW_BAD.length)]:good[Math.floor(Math.random()*good.length)],bad,y:0,life:bad?1.4:99};},
+  step(dt){if(this.cur){this.cur.life-=dt;this.cur.y=Math.min(0,this.cur.y+dt*400);if(this.cur.life<=0){this.newT();}}
+    this.fly=this.fly.filter(f=>{f.t-=dt;f.y+=f.vy*dt;f.x+=f.vx*dt;f.r+=f.vr*dt;return f.t>0;});this.msgT-=dt;},
+  up(a,b,dx,dy){const c=this.cur;if(!c)return;const side=Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy),upw=dy<-30||(Math.abs(dx)<12&&Math.abs(dy)<12);
+    if(side){if(c.bad){this.score+=2;sfx('ok');this.msg='甩掉黑帽！+2';}else{this.combo=0;sfx('no');this.msg='好關鍵字丟掉了…';}this.msgT=.7;
+      this.fly.push({txt:c.txt,bad:c.bad,x:this.W/2,y:this.H*.5,vx:dx>0?700:-700,vy:-60,r:0,vr:dx>0?6:-6,t:.6});this.newT();}
+    else if(upw){if(c.bad){this.left=Math.max(0,this.left-3);this.combo=0;sfx('no');this.msg='是黑帽招數！−3 秒';this.msgT=.9;}
+      else{this.combo++;this.score+=1+Math.min(4,Math.floor(this.combo/4));sfx('tap');}
+      this.fly.push({txt:c.txt,bad:c.bad,x:this.W/2,y:this.H*.5,vx:(Math.random()-.5)*80,vy:-900,r:0,vr:(Math.random()-.5)*3,t:.6});this.newT();}},
+  tissueAt(x,cx,cy,txt,bad,r){x.save();x.translate(cx,cy);x.rotate(r||0);x.fillStyle='#FFFFFF';x.shadowColor='rgba(0,0,0,.12)';x.shadowBlur=10;
+    x.beginPath();x.moveTo(-90,60);x.quadraticCurveTo(-100,-40,-60,-90);x.quadraticCurveTo(0,-110,60,-90);x.quadraticCurveTo(100,-40,90,60);x.closePath();x.fill();x.shadowBlur=0;
+    x.fillStyle=bad?'#D23F67':'#1B1F27';x.font=`900 17px ${FF2}`;x.textAlign='center';x.fillText(txt,0,-20);if(bad){x.font=`700 12px ${FF2}`;x.fillText('⚠',0,8);}x.restore();},
+  draw(){const x=this.x,W=this.W,H=this.H;const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#E3F2FF');g.addColorStop(1,'#FFE9F0');x.fillStyle=g;x.fillRect(0,0,W,H);
+    if(this.cur)this.tissueAt(x,W/2,H*.52+this.cur.y,this.cur.txt,this.cur.bad,0);
+    x.fillStyle='#8ECFE6';rr2(x,W/2-120,H*.66,240,H*.26,18);x.fill();x.fillStyle='#5FB0D8';rr2(x,W/2-70,H*.66-6,140,22,11);x.fill();
+    x.fillStyle='#fff';x.font=`900 18px ${FF2}`;x.textAlign='center';x.fillText('關鍵字面紙',W/2,H*.8);x.font=`500 12px ${FF2}`;x.fillText('↑ 抽好字　← → 甩黑帽',W/2,H*.86);
+    this.fly.forEach(f=>{x.globalAlpha=Math.max(0,f.t*1.7);this.tissueAt(x,f.x,f.y,f.txt,f.bad,f.r);});x.globalAlpha=1;
+    if(this.msgT>0){x.fillStyle='rgba(42,36,56,.85)';rr2(x,W/2-110,22,220,38,14);x.fill();x.fillStyle='#fff';x.font=`700 15px ${FF2}`;x.fillText(this.msg,W/2,47);}},
+  hud(){this.sEl.textContent=`🧻 ${this.score} 分${this.combo>3?'　🔥×'+this.combo:''}`;this.tEl.textContent=`${Math.ceil(this.left)} 秒`;}
+ },
+ /* chihuahua pet */
+ dog:{
+  init(){this.st=dogLoad();this.anim=0;this.fx=[];this.tip='';this.hover=true;
+    const row=el('div','dogbtns');[['🍖','餵內容','food','發了一篇回答客人問題的文章！'],['🦮','散步建連結','walk','認識了附近的部落客，拿到一條好連結！'],['🛁','洗澡修錯誤','clean','修好了 3 個 404 頁面，網站清爽多了！']].forEach(([i,t,k,tip])=>{
+      const b=el('button','btn',`${i} ${t}`);b.addEventListener('click',()=>{this.st[k]=Math.min(100,this.st[k]+28);dogSave(this.st);this.anim=1;this.tip=tip;this.fx.push({e:i,t:1});sfx('ok');flag('dog');updDog();});row.appendChild(b);});
+    gmBody.appendChild(row);this.left=0;},
+  step(dt){this.anim=Math.max(0,this.anim-dt*1.6);this.fx=this.fx.filter(f=>(f.t-=dt)>0);},
+  draw(){const x=this.x,W=this.W,H=this.H,s=this.st,m=(s.food+s.walk+s.clean)/3;
+    x.fillStyle='#FFF4E6';x.fillRect(0,0,W,H);x.fillStyle='#FDE6C4';x.fillRect(0,H*.7,W,H*.3);
+    const cx=W/2,cy=H*.48-Math.abs(Math.sin(this.anim*Math.PI*3))*24+Math.sin(this.t*2)*2,sad=m<35;
+    x.fillStyle='rgba(0,0,0,.08)';x.beginPath();x.ellipse(cx,H*.7,70,12,0,0,7);x.fill();
+    x.fillStyle='#E8B98A';x.beginPath();x.ellipse(cx,cy+70,58,44,0,0,7);x.fill();
+    const tail=Math.sin(this.t*(m>60?14:4))*.5;x.save();x.translate(cx+52,cy+58);x.rotate(-.8+tail);x.fillRect(-4,-30,8,30);x.restore();
+    [-1,1].forEach(sd=>{x.beginPath();x.moveTo(cx+sd*30,cy-30);x.lineTo(cx+sd*(sad?78:66),cy-(sad?40:92));x.lineTo(cx+sd*58,cy-12);x.closePath();x.fill();
+      x.fillStyle='#F7B8C4';x.beginPath();x.moveTo(cx+sd*36,cy-30);x.lineTo(cx+sd*(sad?70:62),cy-(sad?38:78));x.lineTo(cx+sd*54,cy-18);x.closePath();x.fill();x.fillStyle='#E8B98A';});
+    x.beginPath();x.arc(cx,cy,56,0,7);x.fill();x.fillStyle='#F7E3CC';x.beginPath();x.ellipse(cx,cy+24,30,22,0,0,7);x.fill();
+    x.fillStyle='#2A2438';[-1,1].forEach(sd=>{x.beginPath();if(m>75)x.arc(cx+sd*22,cy-4,7,Math.PI,0);else x.arc(cx+sd*22,cy-4,9,0,7);m>75?x.stroke():x.fill();if(m<=75){x.fillStyle='#fff';x.beginPath();x.arc(cx+sd*22+3,cy-7,3,0,7);x.fill();x.fillStyle='#2A2438';}});
+    x.beginPath();x.ellipse(cx,cy+14,7,5,0,0,7);x.fill();x.strokeStyle='#2A2438';x.lineWidth=2;x.beginPath();
+    if(sad)x.arc(cx,cy+34,8,1.15*Math.PI,1.85*Math.PI);else{x.arc(cx-6,cy+22,6,0,Math.PI);x.moveTo(cx+12,cy+22);x.arc(cx+6,cy+22,6,0,Math.PI);}x.stroke();
+    x.fillStyle='#FFA9B8';x.globalAlpha=.6;[-1,1].forEach(sd=>{x.beginPath();x.arc(cx+sd*38,cy+14,8,0,7);x.fill();});x.globalAlpha=1;
+    x.fillStyle='#4F8FEA';rr2(x,cx-30,cy+44,60,10,5);x.fill();
+    this.fx.forEach(f=>{x.globalAlpha=f.t;x.font='34px sans-serif';x.textAlign='center';x.fillText(f.e,cx+60,cy-40-(1-f.t)*60);});x.globalAlpha=1;
+    const bars=[['🍖 內容',s.food],['🦮 連結',s.walk],['🛁 技術',s.clean]];
+    bars.forEach(([n,v],i)=>{const by=H*.76+i*24;x.fillStyle='#1B1F27';x.font=`700 13px ${FF2}`;x.textAlign='left';x.fillText(n,18,by+11);
+      x.fillStyle='#EEE3D6';rr2(x,90,by,W-110,12,6);x.fill();x.fillStyle=v>60?'#3DBE94':v>30?'#F4B740':'#D23F67';rr2(x,90,by,(W-110)*v/100,12,6);x.fill();});
+    x.textAlign='center';x.fillStyle='#5A4A10';x.font=`700 14px ${FF2}`;x.fillText(this.tip||(sad?'小吉好像不太開心…網站很久沒照顧了':m>75?'小吉超開心！網站狀態很好':'小吉在等你陪牠玩'),W/2,30);},
+  hud(){const m=dogMood();this.sEl.textContent=`🐶 小吉心情 ${m}%`;this.tEl.textContent=m>75?'😄':m>35?'🙂':'🥺';}
+ }
+};
+/* pet stats decay in real time (about 1 point every 15 minutes) */
+function dogLoad(){const d=store.get('dog',{food:60,walk:50,clean:55,t:Date.now()}),k=(Date.now()-d.t)/9e5;['food','walk','clean'].forEach(s=>d[s]=Math.max(5,d[s]-k));d.t=Date.now();return d;}
+function dogSave(d){d.t=Date.now();store.set('dog',d);}
+function dogMood(){const d=dogLoad();return Math.round((d.food+d.walk+d.clean)/3);}
+$('gmClose').addEventListener('click',()=>{gmStop();gmwrap.hidden=true;});
+/* the chihuahua lives next to your shop */
+const dog3=new THREE.Group();dog3.position.set(-.45,SY,.48);dog3.rotation.y=.5;shopG.add(dog3);
+(()=>{const c='#E8B98A';const b=add(dog3,new THREE.SphereGeometry(.07,12,10),c,0,.07,0);b.scale.set(1,.85,1.3);
+  add(dog3,new THREE.SphereGeometry(.065,14,12),c,0,.15,.07);[-1,1].forEach(s=>{const e=add(dog3,new THREE.ConeGeometry(.03,.08,8),c,s*.04,.22,.06);e.rotation.z=-s*.35;
+  add(dog3,new THREE.SphereGeometry(.011,6,5),'#2A2438',s*.025,.16,.128);});add(dog3,new THREE.SphereGeometry(.012,6,5),'#2A2438',0,.14,.135);})();
+hitBox(dog3,.18,0,.12,0,'dog');
+function updDog(){const m=dogMood();dog3.userData.m=m;}
+updDog();anims.push(t=>{const m=dog3.userData.m||50;dog3.position.y=SY+(m>60?Math.abs(Math.sin(t/180))*.05:0);dog3.rotation.y=.5+Math.sin(t/(m>60?300:900))*.3;});
 
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
