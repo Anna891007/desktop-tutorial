@@ -278,6 +278,11 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   width:max-content;max-width:calc(100% - 32px);text-align:center;line-height:1.6;
 }
 .toast.warn{background:#2A3242}
+.rankup{position:fixed;z-index:12;left:50%;top:34%;transform:translate(-50%,-50%);background:#FDD13C;color:#1B1F27;border-radius:22px;padding:14px 26px;font-size:24px;font-weight:900;box-shadow:0 14px 34px rgba(20,40,80,.28);text-align:center;pointer-events:none;white-space:nowrap}
+.rankup .hl{color:#1A73E9}
+.rankup small{display:block;font-size:13.5px;font-weight:700;color:#5A4A10;margin-top:2px}
+.rankup.go{animation:rkup 2s ease forwards}
+@keyframes rkup{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}24%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-90%)}}
 .tool{position:relative}
 .tool .badge{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#D23F67}
 .storm{
@@ -326,6 +331,11 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .expanel .exi span{color:var(--ink-soft)}
 .expanel .exi.ok b{color:var(--ok)}
 .expanel .exi .btn{flex:none;padding:8px 12px}
+.far .lbl .nm{display:none}
+.far .lbl:hover .nm,.far .lbl.on .nm,.far .lbl.pulse .nm,.far .lbl.hurt .nm{display:inline}
+.far .lbl:not(.lm):not(.shop){padding:5px 10px}
+.far .lbl.lm{padding:4px 8px;font-size:14px}
+@media (prefers-reduced-motion:reduce){.rankup.go{animation:none}}
 .lbl.lm{font-size:12.5px;padding:5px 11px;background:rgba(255,255,255,.88);color:#1B1F27;font-weight:700}
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .gcard{border-top:5px solid var(--brand);background:var(--paper-2);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
@@ -428,11 +438,13 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
   <button class="tool" id="bDaily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>每日</span><i class="badge" id="dBadge" hidden></i></button>
   <button class="tool" id="bShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>分享</span></button>
   <button class="tool" id="bLinks" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="17" r="2.5"/><circle cx="19" cy="17" r="2.5"/><path d="M6.5 15C9 7 15 7 17.5 15"/></svg><span>連線</span></button>
+  <button class="tool" id="bSfx" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="m17 9 5 6M22 9l-5 6"/></svg><span>音效</span></button>
   <button class="tool round" id="bHelp" aria-label="島嶼指南">?</button>
 </nav>
 
 <div class="zones" id="zones" role="group" aria-label="依類別篩選"></div>
 <div class="toast" id="toast" hidden></div>
+<div class="rankup" id="rankup" hidden></div>
 
 <aside class="sheet" id="sheet" hidden>
   <button class="close" id="sClose" aria-label="關閉">×</button>
@@ -652,12 +664,9 @@ const TOUR=[
 ];
 const ORDER=['kw','intent','cluster','internal','schema','geo','gsc','title','speed','mobile','index','eeat','backlinks','gbp'];
 const COACH=[
- {txt:'這是「{shop}」。店蓋好了，門口卻冷冷清清：在 Google 上排第 5 頁，幾乎沒人翻得到。',act:'shop'},
- {txt:'島上 14 格是 14 個影響排名的關鍵。每點亮一格，那格的建築就會長大，排名往上爬，店門口的客人也會變多。',act:'overview'},
- {txt:'{ex}',act:'focus'},
- {txt:'點一下正在發光的「01 關鍵字研究」，進去看看。',wait:'select:kw',hint:'點島上的「01 關鍵字研究」',pulse:'kw'},
- {txt:'每一格都有一個小任務。這題選出客人真的會搜的字，答對了，這格就會插上旗子點亮。',wait:'done:kw',hint:'選出正確答案',top:true},
- {txt:'第一格點亮了！排名往上爬，店門口也來了第一位客人。接下來：島上小人頭頂冒出問題時，點他、幫他找答案；也注意左上角的颱風預報，沒點亮的格子會被吹壞。把「{shop}」推上第 1 名吧！左上角的藍色卡片會一直提示你下一步；右上角「?」是島嶼指南。',last:true}
+ {txt:'這是「{shop}」，在 Google 排第 5 頁，門口沒半個客人。島上每點亮一格，排名就往上爬。先點發光的「01 關鍵字研究」！',act:'focus',wait:'select:kw',hint:'點島上的「01 關鍵字研究」',pulse:'kw'},
+ {txt:'選出客人真的會搜的字（不是業者的說法），答對就點亮這一格。',wait:'done:kw',hint:'選出正確答案',top:true},
+ {txt:'點亮了！排名往上爬，第一位客人也上門了。接下來看左上角的藍色提示卡，它會一直告訴你下一步；🧭 玩法清單裡還有 7 種玩法等你試。',last:true}
 ];
 const ASKS=[
  {id:'a1',who:'上班族',q:'下班後還能看牙嗎？附近有開到晚上的嗎？',a:'gbp',why:'營業時間寫在 Google 商家檔案，客人在地圖上就看得到。'},
@@ -1053,6 +1062,7 @@ const NBS=NB_COORDS.map(([q,r],i)=>{
   const o={g,h:.66,base:base.clone(),lift:0,rise:0,rim:t.rimMat,aw,sc,st,mark,Y};allGroups.push(o);return o;
 });
 let nbInd=[];
+function lmText(b,txt){const i=txt.indexOf(' ');b.innerHTML='';b.append(el('span','ic',txt.slice(0,i)),el('span','nm',' '+txt.slice(i+1)));}
 function updateNB(){
   nbInd=Object.keys(INDS).filter(k=>k!==shop.ind).slice(0,3);
   NBS.forEach((o,i)=>{const k=nbInd[i],P=PACKS[k],c=INDS[k].color;o.rim.color.set(c);o.aw.color.set(c);
@@ -1060,7 +1070,7 @@ function updateNB(){
     x.fillStyle='#1B1F27';x.textAlign='center';x.textBaseline='middle';let fs=36;
     do{x.font=`900 ${fs}px "Noto Sans TC","PingFang TC",sans-serif`;fs-=2;}while(x.measureText(P.ex).width>230&&fs>18);
     x.fillText(P.ex,128,41);o.st.needsUpdate=true;o.mark.visible=!nbDone[k];
-    if(nbLabels[i])nbLabels[i].textContent=`${P.icon} ${P.ex}${nbDone[k]?' ✓':' ❗'}`;});
+    if(nbLabels[i])lmText(nbLabels[i],`${P.icon}${nbDone[k]?'':'❗'} ${P.ex}${nbDone[k]?' ✓':''}`);});
 }
 updateNB();if(document.fonts)document.fonts.ready.then(updateNB);
 function applyShop(){updateNB();shopT.rimMat.color.set(INDS[shop.ind].color);awnMat.color.set(INDS[shop.ind].color);drawSign();updateProg();}
@@ -1247,7 +1257,7 @@ function burst(x,y,z,color){
   const p=new THREE.Points(g,new THREE.PointsMaterial({color,size:.16,transparent:true,opacity:1,depthWrite:false}));scene.add(p);
   fireworks.push({p,vel,life:1});
 }
-function fireShow(){if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());const C=['#FDD13C','#EE5A7C','#5FB0FF','#7BC74D','#C9B8FF'];
+function fireShow(){for(let i=0;i<7;i++)setTimeout(()=>sfx('pop'),i*380);if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());const C=['#FDD13C','#EE5A7C','#5FB0FF','#7BC74D','#C9B8FF'];
   for(let i=0;i<7;i++)setTimeout(()=>burst((Math.random()-.5)*8,5+Math.random()*2.5,(Math.random()-.5)*6,C[i%5]),i*380);}
 function fireTick(){for(let i=fireworks.length-1;i>=0;i--){const f=fireworks[i],a=f.p.geometry.attributes.position;
   for(let k=0;k<f.vel.length;k++){f.vel[k].y-=.0015;a.array[k*3]+=f.vel[k].x;a.array[k*3+1]+=f.vel[k].y;a.array[k*3+2]+=f.vel[k].z;f.vel[k].multiplyScalar(.97);}
@@ -1343,7 +1353,7 @@ function botStep(){const t=walkers[1].tile.t;const opts=t.links.concat(t.incomin
 const labelsEl=$('labels');
 TOPICS.forEach(t=>{
   const b=el('button','lbl');
-  b.innerHTML=`<span class="no" style="color:${ZONES[t.zone].color}">${t.no}</span>${t.name}<span class="tick">✓</span><span class="warn">⚠ 受損</span>`;
+  b.innerHTML=`<span class="no" style="color:${ZONES[t.zone].color}">${t.no}</span><span class="nm">${t.name}</span><span class="tick">✓</span><span class="warn">⚠ 受損</span>`;
   b.addEventListener('click',()=>select(t.id));
   if(done[t.id])b.classList.add('done');
   labelsEl.appendChild(b);t.label=b;
@@ -1384,12 +1394,13 @@ function updateProg(){
   $('dBadge').hidden=daily.last===dayKey(new Date());
 }
 function markDone(id){
-  if(done[id])return;done[id]=1;store.set('done',done);
+  if(done[id])return;const r0=rankOf(litCount());done[id]=1;store.set('done',done);
   const fixed=!!damaged[id];if(fixed){delete damaged[id];store.set('damaged',damaged);}
   const t=byId[id];t.tile.flag.visible=true;t.label.classList.add('done');
   $('sLit').classList.add('show');updateProg();renderList();
   const n=litCount();
-  toast(n===TOPICS.length?`「${shop.name}」衝上第 1 名！`:`${fixed?'修好並':''}點亮「${t.name}」，排名升到${rankTxt(rankOf(n))}`);
+  toast(n===TOPICS.length?`「${shop.name}」衝上第 1 名！`:`${fixed?'修好並':''}點亮「${t.name}」，排名往前 ${r0-rankOf(n)} 名`);
+  celebrate(id);if(rankOf(n)<r0)setTimeout(()=>rankUp(r0,rankOf(n),n===TOPICS.length?'👑 衝上第 1 名！':`點亮「${t.name}」`),500);
   coachEvent('done:'+id);
 }
 
@@ -1607,7 +1618,7 @@ rain.visible=false;scene.add(rain);
 let stormAt=null,storming=false,stormF=0,flash=0,lastStTxt='';
 const stEl=$('storm'),stTxt=$('stTxt');
 function startStorm(){
-  if(storming)return;storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
+  if(storming)return;sfx('storm');storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
   if(selected)deselect();flyTo(new THREE.Vector3(0,0,-.2),overviewDist());
   toast('🌀 Google 核心更新颱風來襲！沒點亮的格子要小心了','warn',3200);
   setTimeout(hitStorm,3300);setTimeout(endStorm,7200);
@@ -1731,7 +1742,7 @@ $('bShare').addEventListener('click',async()=>{flag('share');
 });
 
 /* landmarks & easter eggs */
-function egg(id){if(eggs[id])return;eggs[id]=1;store.set('eggs',eggs);setTimeout(()=>toast(`🥚 發現彩蛋：${EGG_NAME[id]}（${Object.keys(eggs).length} / ${EGGS.length}）`,'warn',3200),900);renderList();}
+function egg(id){if(eggs[id])return;eggs[id]=1;setTimeout(()=>sfx('egg'),900);store.set('eggs',eggs);setTimeout(()=>toast(`🥚 發現彩蛋：${EGG_NAME[id]}（${Object.keys(eggs).length} / ${EGGS.length}）`,'warn',3200),900);renderList();}
 const lmwrap=$('lmwrap'),lmBody=$('lmBody');
 $('lmClose').addEventListener('click',()=>lmwrap.hidden=true);
 lmwrap.addEventListener('click',e=>{if(e.target===lmwrap)lmwrap.hidden=true;});
@@ -1793,7 +1804,7 @@ const ACTS={
 };
 let botClicks=[];
 bot.traverse(o=>{if(o.isMesh){o.userData.act='bot';extraPick.push(o);}});hitBox(bot,.35,0,.25,0,'bot');
-function collectCake(i){const c=cakes[i];if(!c||!c.visible)return;c.visible=false;gotCakes[i]=1;store.set('cakes',gotCakes);
+function collectCake(i){const c=cakes[i];if(!c||!c.visible)return;sfx('coin');c.visible=false;gotCakes[i]=1;store.set('cakes',gotCakes);
   const n=Object.keys(gotCakes).length;toast(n>=cakes.length?'🥮 7 個太陽餅全收集！你是「台中通」了':`🥮 撿到太陽餅 ${n} / ${cakes.length}`);if(n>=cakes.length)egg('cakes');}
 /* the 7th cake hides on the main island, behind the shop */
 makeCake(shopG,-.62,SY,-.5,6);
@@ -1813,7 +1824,7 @@ function nbAct(i){const k=nbInd[i],P=PACKS[k],o=NBS[i];if(selected)deselect();fl
    quiz(b,'你會建議他怎麼做？',P.nb.opts,P.nb.ok,P.nb.why,()=>{nbDone[k]=1;store.set('nbDone',nbDone);updateNB();renderList();
     setTimeout(()=>toast(`${P.icon} ${P.nb.owner}：「${P.nb.thanks}」`,null,3800),700);});});}
 /* landmark labels */
-Object.entries(LM).forEach(([k,L])=>{L.key=k;const b=el('button','lbl lm',L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
+Object.entries(LM).forEach(([k,L])=>{L.key=k;const b=el('button','lbl lm');lmText(b,L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
 NBS.forEach((o,i)=>nbLabels[i]=LM['nb'+i].label);updateNB();
 /* secret: type S-E-O, or tap the island name 3 times */
 let keyBuf='';
@@ -1838,7 +1849,7 @@ function lmTick(now,w,h){
     pirate.position.set(Math.sin(a)*R,.05+Math.sin(now/500)*.04,Math.cos(a)*R);pirate.rotation.y=a+(pirateRun.dir>0?0:Math.PI);
     if(pirateRun.flee)pirateRun.t0-=8;
     if(k>=1){pirate.visible=false;pirateRun=null;pirateNext=now+70000+Math.random()*40000;}}
-  fireTick();
+  fireTick();beamTick(now);
   if(!reduce)NBS.forEach((o,i)=>{if(o.mark.visible){o.mark.position.y=o.Y+1.05+Math.sin(now/300+i)*.06;o.mark.rotation.y=now/700;}});
   Object.values(LM).forEach(L=>{const p=L.obj.getWorldPosition(v);p.y+=L.y;p.project(camera);
     L.label.classList.toggle('off',p.z>1);L.label.classList.toggle('new',!/^nb/.test(L.key)&&!seen[L.key]);L.label.style.transform=`translate(${(p.x+1)/2*w}px,${(1-p.y)/2*h}px) translate(-50%,-100%)`;});
@@ -1939,6 +1950,46 @@ function exploreTick(){
 exBtn.addEventListener('click',()=>{exPanel.hidden=!exPanel.hidden;if(!exPanel.hidden)renderExplore();});
 exploreTick();
 
+/* game feel: sound, light beam, confetti, rank-up popup */
+let sfxOn=store.get('sfx',true),actx=null;
+function tone(f,t0,dur,type,vol,f2){const a=actx,o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,a.currentTime+t0);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,a.currentTime+t0+dur);
+  g.gain.setValueAtTime(0,a.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.12,a.currentTime+t0+.01);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t0+dur);
+  o.connect(g).connect(a.destination);o.start(a.currentTime+t0);o.stop(a.currentTime+t0+dur+.02);}
+function noise(dur,vol){const a=actx,n=a.sampleRate*dur,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.frequency.value=500;g.gain.value=vol;s.buffer=b;s.connect(f).connect(g).connect(a.destination);s.start();}
+function sfx(k){if(!sfxOn)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+  if(k==='ok'){tone(660,0,.14,'triangle');tone(990,.09,.22,'triangle');}
+  else if(k==='no'){tone(220,0,.22,'square',.06,160);}
+  else if(k==='up'){[523,659,784,1047].forEach((f,i)=>tone(f,i*.08,.25,'triangle',.11));}
+  else if(k==='coin'){tone(988,0,.08,'square',.06);tone(1319,.07,.25,'square',.06);}
+  else if(k==='egg'){[784,988,1175,1568].forEach((f,i)=>tone(f,i*.06,.18,'sine',.09));}
+  else if(k==='storm'){noise(1.6,.35);tone(90,0,1.2,'sawtooth',.05,50);}
+  else if(k==='pop'){noise(.25,.2);tone(300,0,.3,'sine',.06,900);}
+  else if(k==='tap'){tone(880,0,.05,'sine',.05);}
+ }catch(e){}}
+const bSfx=$('bSfx');
+function syncSfx(){bSfx.querySelector('span').textContent=sfxOn?'音效':'靜音';bSfx.setAttribute('aria-pressed',sfxOn);bSfx.querySelector('.on').style.display=sfxOn?'':'none';bSfx.querySelector('.off').style.display=sfxOn?'none':'';}
+bSfx.addEventListener('click',()=>{sfxOn=!sfxOn;store.set('sfx',sfxOn);syncSfx();sfx('tap');});syncSfx();
+/* every quiz button in the game: sound for right / wrong */
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.opt');if(!b)return;
+  setTimeout(()=>{if(b.classList.contains('right'))sfx('ok');else if(b.classList.contains('wrong'))sfx('no');},0);},true);
+const beams=[];
+function celebrate(id){
+  const o=byId[id].tile,c=ZONES[o.t.zone].color,p=o.base.clone();
+  if(!reduce){const m=new THREE.Mesh(new THREE.CylinderGeometry(.55,.75,7,18,1,true),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));
+    m.position.set(p.x,o.h+3.5,p.z);scene.add(m);beams.push({m,t0:performance.now()});
+    burst(p.x,o.h+1.2,p.z,c);burst(p.x,o.h+1.4,p.z,'#FDD13C');o.pop=performance.now();}
+  sfx('up');
+}
+function beamTick(now){for(let i=beams.length-1;i>=0;i--){const b=beams[i],k=(now-b.t0)/1300;
+  b.m.material.opacity=.5*(1-k);b.m.scale.set(1+k*.6,1,1+k*.6);if(k>=1){scene.remove(b.m);b.m.geometry.dispose();beams.splice(i,1);}}}
+const rkEl=$('rankup');let rkT;
+function rankUp(from,to,extra){rkEl.innerHTML='';
+  if(rankTxt(from)!==rankTxt(to))rkEl.append(document.createTextNode(`排名 ${rankTxt(from)} → `),el('span','hl',rankTxt(to)),el('small',null,extra||'排名上升！'));
+  else rkEl.append(document.createTextNode('往前衝 '),el('span','hl',`${from-to} 名`),document.createTextNode('！'),el('small',null,`${extra||''}｜目前第 ${to} 名（${rankTxt(to)}）`));
+  rkEl.hidden=false;rkEl.classList.remove('go');void rkEl.offsetWidth;rkEl.classList.add('go');clearTimeout(rkT);rkT=setTimeout(()=>rkEl.hidden=true,2000);}
+
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};fly=null;});
@@ -1989,7 +2040,8 @@ function frame(now){
     const goal=o.id&&o.id===selected?.38:0;
     o.lift=reduce?goal:o.lift+(goal-o.lift)*.14;
     o.g.position.y=-(1-ease(o.rise))*(o.h+.7)+o.lift;
-    if(o.sg){const gg=done[o.id]?1:0;o.grow=reduce?gg:o.grow+(gg-o.grow)*.08;o.sg.scale.setScalar(.5+.5*o.grow);
+    if(o.sg){const gg=done[o.id]?1:0;o.grow=reduce?gg:o.grow+(gg-o.grow)*.08;
+      const pk=o.pop?Math.min(1,(now-o.pop)/900):1;if(pk>=1)o.pop=0;o.sg.scale.setScalar((.5+.5*o.grow)*(1+Math.sin(pk*Math.PI*3)*.18*(1-pk)));
       const dg=damaged[o.id]?1:0;o.dmg=reduce?dg:(o.dmg||0)+(dg-(o.dmg||0))*.1;o.sg.rotation.z=o.dmg*.7;o.sg.rotation.x=o.dmg*.25;
       if(o.dmg>.01&&!reduce)o.g.rotation.z=Math.sin(now/90+o.base.x)*.012*o.dmg;else o.g.rotation.z=0;}
   });
@@ -2016,7 +2068,9 @@ function frame(now){
   people.forEach(q=>{
     if(!reduce&&!(ask&&ask.q===q))q.a+=q.sp*16;
     const hb=q.host;q.p.visible=hb.rise>.95&&(q.i==null||q.i<litCount()+helpedCount());
+    if(q.i!=null){if(q.p.visible&&!q.was&&elp>3500&&!reduce)q.arrive=now;q.was=q.p.visible;}
     q.p.position.set(hb.base.x+Math.cos(q.a)*q.r,hb.g.position.y+hb.h+.07,hb.base.z+Math.sin(q.a)*q.r);
+    if(q.arrive){const k=Math.min(1,(now-q.arrive)/2400);if(k>=1)q.arrive=0;else{const st=v.set(hb.base.x+(q.i%2?1.6:-1.6),q.p.position.y,hb.base.z+3.2);q.p.position.lerpVectors(st,q.p.position,ease(k));}}
     q.p.rotation.y=-q.a+(q.sp>0?Math.PI:0);
     if(!reduce)q.p.position.y+=Math.abs(Math.sin(now/120+q.a*10))*.02;
   });
@@ -2043,6 +2097,7 @@ function frame(now){
     shopLbl.classList.toggle('off',v.z>1);
     shopLbl.style.transform=`translate(${(v.x+1)/2*w}px,${(1-v.y)/2*h}px) translate(-50%,-100%)`;}
   askTick(now,w,h);
+  labelsEl.classList.toggle('far',camera.position.distanceTo(controls.target)>(isMobile()?26:17.5));
   lmTick(now,w,h);
   goalTick(now);
   renderer.render(scene,camera);
