@@ -430,6 +430,23 @@ body.cine .dock{opacity:0;pointer-events:none}
   .coach{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)!important}
 }
 .coach{bottom:calc(env(safe-area-inset-bottom,0px) + 90px)}
+@media (max-width:719px){
+  .hud .brandcard{padding:7px 12px;gap:8px;border-radius:14px}
+  .hud .brandcard img{width:70px}
+  .hud .brandcard .sep{display:none}
+  .hud .brandcard h1{font-size:15px}
+  .hud .brandcard p{display:none}
+  .hud{gap:6px}
+  .goal{max-width:calc(100vw - 80px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tybtn{font-size:12px;padding:6px 11px}
+  .sheet{max-height:52%!important}
+  .coach{padding:12px 14px}
+  .coach .txt{font-size:14px;line-height:1.65;margin-top:6px}
+  .coach .person img{width:38px;height:38px}
+  body:has(#sheet:not([hidden])) .hud,body:has(#sheet:not([hidden])) .tools,body:has(#sheet:not([hidden])) .dock,
+  body:has(#coach:not([hidden])) .hud,body:has(#coach:not([hidden])) .tools,body:has(#coach:not([hidden])) .dock,
+  body:has(#tour:not([hidden])) .hud,body:has(#tour:not([hidden])) .dock{opacity:0;pointer-events:none}
+}
 .lbl.lm.new::after{content:"NEW";margin-left:6px;background:#D23F67;color:#fff;font-size:10px;font-weight:900;border-radius:99px;padding:1px 6px;letter-spacing:.04em}
 .exbtn{border:0;border-radius:999px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:700;padding:7px 13px;box-shadow:0 3px 12px rgba(20,40,80,.12);cursor:pointer}
 .exbtn.all{background:var(--ok-soft);color:var(--ok)}
@@ -2740,7 +2757,7 @@ function resize(){
   const w=innerWidth,h=innerHeight;
   renderer.setSize(w,h,false);camera.aspect=w/h;
   if(panel==='side'&&w>=720)camera.setViewOffset(w,h,250,0,w,h);
-  else if(panel==='bottom')camera.setViewOffset(w,h,0,h*(w<720?.15:.08),w,h);
+  else if(panel==='bottom')camera.setViewOffset(w,h,0,h*(w<720?.25:.08),w,h);
   else camera.clearViewOffset();
   camera.updateProjectionMatrix();
 }
