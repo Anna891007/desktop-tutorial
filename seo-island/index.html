@@ -290,6 +290,13 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 @keyframes tin{0%{opacity:0;transform:translate(-50%,14px) scale(.92)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
 .rankup.alert{background:#D23F67;color:#fff}.rankup.alert small{color:#FFE3EA}.rankup.alert .hl{color:#FFE08A}
 .rankup.egg{background:#9A7BEA;color:#fff}.rankup.egg small{color:#EFE8FF}
+.tybtn{border:0;border-radius:999px;background:#3D5A80;color:#fff;font-size:13px;font-weight:700;padding:7px 13px;box-shadow:0 3px 12px rgba(20,40,80,.16);cursor:pointer}
+.tybtn.done{background:var(--paper);color:var(--ok)}
+.bub.ty{border-color:#3D5A80;background:#E6EEF7}.bub.ty::after{border-top-color:#3D5A80}
+body.tyhol::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.45;background:repeating-linear-gradient(105deg,rgba(255,255,255,0) 0 15px,rgba(235,244,255,.35) 15px 16px);background-size:160px 160px;animation:rain2 .5s linear infinite}
+body.tyhol{--g1:#9AA8C2;--g2:#B9C3D6;--g3:#D3D9E4}
+@keyframes rain2{from{background-position:0 0}to{background-position:-40px 160px}}
+@media (prefers-reduced-motion:reduce){body.tyhol::before{animation:none}}
 .bellbtn{border:0;border-radius:999px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:700;padding:7px 13px;box-shadow:0 3px 12px rgba(20,40,80,.12);cursor:pointer}
 .bellbtn b{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:99px;background:#D23F67;color:#fff;font-size:11px;line-height:18px;text-align:center}
 .hudrow{display:flex;gap:8px;flex-wrap:wrap}
@@ -510,6 +517,7 @@ body.cine .cineskip{display:block}
 <div class="prog" aria-live="polite"><span class="bar"><i id="progBar"></i></span><span id="progTxt">排名 第 5 頁｜點亮 0 / 14</span><span class="mini" id="miniSt"></span><button class="hudT" id="hudT" aria-label="收合資訊" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button></div>
 <div class="storm" id="storm" aria-live="polite"><span id="stTxt">🌀 演算法颱風正在形成</span><button id="stGo">提早迎戰</button></div>
 <button class="goal" id="goal" hidden><span id="goalTxt"></span></button>
+<button class="tybtn" id="tyBtn" hidden></button>
 <div class="hudrow"><button class="exbtn" id="exBtn" aria-label="這座島的玩法">🧭 玩法</button><button class="bellbtn" id="bellBtn" aria-label="通知紀錄">🔔 通知</button></div>
 <div class="expanel notes" id="bellPanel" hidden></div>
 <div class="expanel" id="exPanel" hidden></div>
@@ -911,6 +919,24 @@ const EGGS=[
 ];
 const EGG_NAME=Object.fromEntries(EGGS.map(e=>[e[0],e[1]]));
 const maint=Object.assign({tasks:[],lastDay:''},store.get('maint',{}));
+const TYPHOON={name:'薔琵',start:'2026-10-23',end:'2026-10-24',asof:'10/23 晚間',
+  off:['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','宜蘭縣','連江縣'],
+  all:['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','台南市','高雄市','屏東縣','宜蘭縣','花蓮縣','台東縣','澎湖縣','金門縣','連江縣']};
+const TYC={
+ dental:{id:'ty',ty:1,who:'放颱風假的上班族',q:'颱風天 牙醫 有開嗎',a:'gbp',why:'他要確認你颱風天有沒有開。商家檔案設好特殊營業時間，地圖上就會直接顯示。'},
+ food:{id:'ty',ty:1,who:'宅在家的人',q:'颱風天 外送 還有開嗎',a:'gbp',why:'他在地圖上找現在還有營業的店。商家檔案的營業狀態要即時更新。'},
+ ecom:{id:'ty',ty:1,who:'等包裹的人',q:'颱風 宅配 會延遲嗎',a:'geo',why:'在官網用一問一答直接寫出颱風期間的出貨安排，搜尋和 AI 摘要都會抓到。'},
+ b2b:{id:'ty',ty:1,who:'急著交貨的採購',q:'颱風 交期 會延誤嗎',a:'geo',why:'在官網公告頁直接回答交期安排，採購搜到就能安心，也少接很多電話。'}};
+const TYQ={
+ open:[
+  {q:'{shop}颱風天照常營業，Google 商家檔案要做什麼？',o:['發一則貼文說明照常營業，並確認當天營業時間正確','什麼都不用改，本來就有開','把營業時間改成 24 小時'],ok:0,why:'很多人出門前會先查地圖確認有沒有開，貼文和營業時間是第一眼看到的資訊。'},
+  {q:'官網的「颱風天照常營業」公告，放哪裡最好？',o:['只發在 FB 粉專','首頁最上方的公告列，寫清楚日期與營業時間','寫成一篇部落格文章'],ok:1,why:'從搜尋點進官網的人，第一眼就看得到。'}],
+ closed:[
+  {q:'{shop}颱風天暫停營業，Google 商家檔案該怎麼改？',o:['把商家標成「永久停業」','設定這兩天的「特殊營業時間」為休息','不用改，大家都知道颱風天會休息'],ok:1,why:'只影響這兩天，颱風過後自動恢復，地圖上也會顯示正確狀態。'},
+  {q:'官網的颱風休息公告，放哪裡最好？',o:['首頁最上方的公告列，寫清楚休息日期與恢復時間','只發在 FB 粉專','寫成一篇部落格文章'],ok:0,why:'從搜尋點進官網的人，第一眼就看得到。'}]};
+const typh=Object.assign({city:'',choice:'',t1:0,t2:0,t3:0,got:0,shown:''},store.get('typh',{}));
+const tyToday=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
+const typhActive=()=>location.hash.indexOf('typhoon')>=0||(tyToday>=TYPHOON.start&&tyToday<=TYPHOON.end);
 const damaged=store.get('damaged',{}),helped=store.get('helped',{}),daily=store.get('daily',{last:'',streak:0});
 const litCount=()=>Object.keys(done).length;
 const helpedCount=()=>Object.keys(helped).length;
@@ -1739,6 +1765,7 @@ function renderList(){
   lBody.appendChild(el('h3',null,'🙋 客人圖鑑'));
   ASKS.map(askOf).forEach(a=>{const r=el('div','cust'+(helped[a.id]?'':' no'));
     r.textContent=helped[a.id]?`✓ ${a.who}：「${a.q}」`:'？？？ 還沒幫到這位客人';lBody.appendChild(r);});
+  if(typh.got||typhActive()){lBody.appendChild(el('h3',null,'🌀 限定卡'));const r=el('div','cust'+(typh.got?'':' no'));r.textContent=typh.got?`✓ ${TYPHOON.name}颱風假 2026`:`？？？ 完成${TYPHOON.name}颱風假任務（限時）`;lBody.appendChild(r);}
   lBody.appendChild(el('h3',null,'🥚 彩蛋'));
   const E=eggs;
   EGGS.forEach(([id,name,hint])=>{const r=el('div','cust'+(E[id]?'':' no'));r.textContent=E[id]?`✓ ${name}`:`？？？ 提示：${hint}`;lBody.appendChild(r);});
@@ -1788,7 +1815,7 @@ const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0xD6E6F5,siz
 rain.visible=false;scene.add(rain);
 let stormAt=null,storming=false,stormF=0,flash=0,lastStTxt='';
 const stEl=$('storm'),stTxt=$('stTxt');
-function startStorm(){
+function startStorm(force){if(!force&&typhActive()&&!storming)return;
   if(storming)return;sfx('storm');storming=true;stormAt=Infinity;stEl.classList.add('live');stTxt.textContent='🌀 Google 核心更新颱風來襲中…';
   if(selected)deselect();playCine(stormShots(),()=>flyTo(new THREE.Vector3(0,0,-.2),overviewDist()));
   setTimeout(()=>{hitStorm();stormCap();},3300);setTimeout(endStorm,7200);
@@ -1808,8 +1835,9 @@ function endStorm(){
   else msg='受損的格子還沒修好，排名一直被拖累！';
   if(msg)toast(msg,'warn');
 }
-$('stGo').addEventListener('click',startStorm);
+$('stGo').addEventListener('click',()=>startStorm(true));
 function stormTick(now){
+  if(typhActive()&&!storming){setSt(`☔ ${TYPHOON.name}颱風假中，演算法颱風休息`);return;}
   if(stormAt===null){if(welcome.hidden&&coachIdx<0&&!cine&&shopBuilt)stormAt=now+60000;else{setSt('🌀 演算法颱風正在形成');return;}}
   if(storming)return;
   if(now>=stormAt){if(!welcome.hidden||coachIdx>=0||!askwrap.hidden||!qzwrap.hidden||!gmwrap.hidden){stormAt=now+15000;return;}startStorm();return;}
@@ -1821,10 +1849,10 @@ function setSt(t){if(t!==lastStTxt){stTxt.textContent=t;lastStTxt=t;}}
 const bubW=el('div','bubw'),bub=el('button','bub');bubW.appendChild(bub);bubW.hidden=true;labelsEl.appendChild(bubW);
 let ask=null,nextAskAt=performance.now()+4000;
 function spawnAsk(now){
-  const pool=ASKS.filter(a=>!helped[a.id]);const a=askOf((pool.length?pool:ASKS)[Math.floor(Math.random()*(pool.length||ASKS.length))]);
+  const pool=ASKS.filter(a=>!helped[a.id]);const a=(typhActive()&&typh.choice&&!typh.t3&&(tyAsk||Math.random()<.5))?TYC[shop.ind]||TYC.dental:askOf((pool.length?pool:ASKS)[Math.floor(Math.random()*(pool.length||ASKS.length))]);
   const hosts=people.filter(q=>q.i==null&&q.p.visible);if(!hosts.length){nextAskAt=now+3000;return;}
   ask={a,q:hosts[Math.floor(Math.random()*hosts.length)],until:now+30000};
-  bub.innerHTML='';bub.append(document.createTextNode(`🙋 ${a.q}`));bub.title=a.q;bubW.hidden=false;
+  bub.innerHTML='';bub.classList.toggle('ty',!!a.ty);bub.append(document.createTextNode(`${a.ty?'☔':'🙋'} ${a.q}`));bub.title=a.q;bubW.hidden=false;
 }
 function clearAsk(delay){ask=null;bubW.hidden=true;nextAskAt=performance.now()+delay;}
 bub.addEventListener('click',()=>{
@@ -1835,7 +1863,8 @@ bub.addEventListener('click',()=>{
   opts.forEach(id=>{const t=byId[id],b=el('button','opt',`${t.no} ${t.name}`);
     b.addEventListener('click',()=>{
       box_.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x===b)x.classList.add(id===a.a?'right':'wrong');});
-      if(id===a.a){const first=!helped[a.id];helped[a.id]=1;store.set('helped',helped);
+      if(id===a.a&&a.ty){tyAsk=false;typh.t3=1;store.set('typh',typh);updTyBtn();$('aRes').textContent='答對了！'+a.why;setTimeout(()=>{askwrap.hidden=true;playCine(walkInShots(a.who));setTimeout(checkTyph,5000);},1300);}
+      else if(id===a.a){const first=!helped[a.id];helped[a.id]=1;store.set('helped',helped);
         $('aRes').textContent='答對了！'+a.why;renderList();
         setTimeout(()=>{askwrap.hidden=true;playCine(walkInShots(a.who));if(first)logNote(`🙋 ${a.who}收進客人圖鑑`,'');},1300);}
       else $('aRes').textContent=`這格幫不上忙。答案是「${byId[a.a].name}」：${a.why}`;
@@ -1888,7 +1917,7 @@ async function makeCard(){
   const W_=1080,H_=1350,c=document.createElement('canvas');c.width=W_;c.height=H_;const x=c.getContext('2d');
   x.fillStyle='#FDD13C';x.fillRect(0,0,W_,H_);
   const logo=document.querySelector('.brandcard img');if(logo&&logo.complete)x.drawImage(logo,60,52,175,50);
-  x.fillStyle='#1B1F27';x.textAlign='right';x.font=`700 32px ${FF}`;x.fillText('SEO 島｜網站健檢卡',W_-60,88);
+  x.fillStyle='#1B1F27';x.textAlign='right';x.font=`700 32px ${FF}`;x.fillText(typhActive()?`☔ ${TYPHOON.name}颱風假，我在經營 SEO 島`:'SEO 島｜網站健檢卡',W_-60,88);
   x.textAlign='left';x.font=`900 84px ${FF}`;wrapText(x,shop.name,60,215,W_-120,90,1);
   x.font=`500 32px ${FF}`;x.fillStyle='#5A4A10';x.fillText(INDS[shop.ind].name,62,270);
   x.save();rr(x,60,305,W_-120,560,36);x.clip();x.fillStyle='#DCEAF5';x.fillRect(60,305,W_-120,560);
@@ -1965,7 +1994,7 @@ const ACTS={
  pirate(){
   openLM('🏴‍☠️ 黑帽 SEO 海盜船','「嘿，老闆！要不要買 1000 條連結？只要 999 元，保證衝第 1 名！」',b=>{
    const row=el('div','mrow');const y=el('button','btn','好啊，買！'),n=el('button','btn primary','不要，謝謝');
-   y.addEventListener('click',()=>{lmwrap.hidden=true;egg('caught');toast('🚨 被 Google 抓包了！演算法颱風提早來襲','warn',3000);setTimeout(startStorm,1200);});
+   y.addEventListener('click',()=>{lmwrap.hidden=true;egg('caught');toast('🚨 被 Google 抓包了！演算法颱風提早來襲','warn',3000);setTimeout(()=>startStorm(true),1200);});
    n.addEventListener('click',()=>{lmwrap.hidden=true;egg('pirate');toast('明智！買來的垃圾連結，可能讓網站被懲罰。');pirateRun&&(pirateRun.flee=true);});
    row.append(y,n);b.appendChild(row);});},
  elf(){if(elfPop)return;elfPop=performance.now();elf.visible=true;egg('elf');
@@ -2057,7 +2086,7 @@ function nextGoal(now){
 }
 function goalTick(now){
   if(now-goalT<400)return;goalT=now;
-  miniSt.textContent=storming?'🌀 來襲中':stormAt===null?'🌀 形成中':'🌀 '+mmss(stormAt-now);
+  miniSt.textContent=typhActive()&&!storming?'☔ 颱風假':storming?'🌀 來襲中':stormAt===null?'🌀 形成中':'🌀 '+mmss(stormAt-now);
   const busy=!welcome.hidden||coachIdx>=0||touring;
   exploreTick();exBtn.parentElement.hidden=busy;if(busy){exPanel.hidden=true;bellPanel.hidden=true;}
   if(busy){goalEl.hidden=true;return;}
@@ -2598,6 +2627,47 @@ function buildShots(){const T=()=>shopBase.clone().setY(shopO.h+.45);
   return [{dur:2400,target:T,from:[5*R_,1.02,-.3],to:[3.6*R_,1.08,.25],cap:`🔨「${shop.name}」開工！`,at:()=>{drawSign();buildT=performance.now();burst(shopBase.x,SY+.2,shopBase.z,'#E9D5B8');sfx('pop');}},
           {dur:2200,target:T,from:[3.6*R_,1.08,.25],to:[3.2*R_,1.12,.6],cap:`🎉「${shop.name}」開幕了！`,at:()=>{shopBuilt=true;shopLbl.hidden=false;burst(shopBase.x,SY+1.4,shopBase.z,'#FDD13C');burst(shopBase.x,SY+1.5,shopBase.z,'#F2789A');sfx('up');}}];}
 function playIntro(){hideShop();playCine(introShots(),()=>{openWelcome();wName.focus();});}
+/* typhoon holiday (limited event) */
+const tyBtn=$('tyBtn');
+function updTyBtn(){const n=(typh.t1?1:0)+(typh.t2?1:0)+(typh.t3?1:0);tyBtn.hidden=!typhActive()&&!typh.got;
+  tyBtn.classList.toggle('done',!!typh.got);tyBtn.textContent=typh.got?`✓ ${TYPHOON.name}颱風假任務完成`:`☔ ${TYPHOON.name}颱風假任務 ${n}/3`;sandbag.visible=!!typh.got;}
+function openTyph(){
+  typh.shown=tyToday;store.set('typh',typh);const off=typh.city&&TYPHOON.off.includes(typh.city);
+  openLM(typh.choice?`☔ ${shop.name}的颱風假任務`:`☔ ${shop.name}颱風天要開嗎？`,`${TYPHOON.name}颱風｜限時任務`,b=>{
+    b.appendChild(el('p','mres',typh.choice?`你選了「${typh.choice==='open'?'照常營業':'暫停營業'}」。完成 3 個任務，讓客人不會白跑，也拿到限定圖鑑卡。`
+      :`${TYPHOON.name}颱風來了，${off?typh.city+' 10/24 停班停課，':''}放颱風假的人都窩在家滑手機搜東搜西。這時候最常漏掉的，是讓客人知道你到底有沒有開。`));
+    const sel=el('select','field');sel.setAttribute('aria-label','縣市');const o0=el('option',null,'選擇你的縣市');o0.value='';sel.appendChild(o0);
+    TYPHOON.all.forEach(c=>{const o=el('option',null,c);o.value=c;sel.appendChild(o);});sel.value=typh.city;
+    const note=el('p','note',typh.city?`${typh.city} 10/24（六）：${TYPHOON.off.includes(typh.city)?'停止上班、停止上課':'照常上班、照常上課'}（資料截至 ${TYPHOON.asof}）`:'選了縣市，就能看到你那邊明天的狀況。');
+    sel.addEventListener('change',()=>{typh.city=sel.value;store.set('typh',typh);openTyph();});
+    b.append(el('h3',null,'你在哪個縣市？'),sel,note);
+    if(!typh.choice){const row=el('div','mrow'),a=el('button','btn primary','照常營業'),c=el('button','btn','暫停營業');
+      a.addEventListener('click',()=>{typh.choice='open';store.set('typh',typh);openTyph();updTyBtn();});
+      c.addEventListener('click',()=>{typh.choice='closed';store.set('typh',typh);openTyph();updTyBtn();});row.append(a,c);b.appendChild(row);}
+    else{
+      [['t1','任務 1：更新 Google 商家檔案'],['t2','任務 2：在官網放上公告'],['t3','任務 3：幫一位颱風假客人找到答案']].forEach(([k,t])=>{const r=el('div','cust'+(typh[k]?'':' no'));r.textContent=(typh[k]?'✓ ':'○ ')+t;b.appendChild(r);});
+      const qi=!typh.t1?0:!typh.t2?1:-1;
+      if(qi>=0){const d=TYQ[typh.choice][qi];quiz(b,d.q.replace('{shop}',shop.name),d.o,d.ok,d.why,()=>{typh['t'+(qi+1)]=1;store.set('typh',typh);updTyBtn();setTimeout(()=>{openTyph();checkTyph();},1400);});}
+      else if(!typh.t3){const g=el('button','btn primary','☔ 去找颱風假客人');g.addEventListener('click',()=>{lmwrap.hidden=true;tyAsk=true;nextAskAt=0;if(ask)clearAsk(0);toast('☔ 颱風假客人出現了，看島上小人頭頂的泡泡');});b.appendChild(g);}
+      if(typh.got)b.appendChild(el('p','mres',`🌀 限定圖鑑卡：${TYPHOON.name}颱風假 2026｜店門口堆好沙包、窗戶貼上防颱膠帶，颱風過後會留著當紀念。`));}
+    b.appendChild(el('p','note','最新停班停課以行政院人事行政總處公告為準。風雨大，非必要別出門。'));
+    const lk=el('a','btn','人事行政總處公告');lk.href='https://www.dgpa.gov.tw/typh/daily/nds.html';lk.target='_blank';lk.rel='noopener';const rw=el('div','mrow');rw.appendChild(lk);b.appendChild(rw);
+  });}
+function checkTyph(){if(typh.got||!(typh.t1&&typh.t2&&typh.t3))return;typh.got=tyToday;store.set('typh',typh);updTyBtn();renderList();
+  popEvent(`🌀 限定圖鑑卡：${TYPHOON.name}颱風假 2026`,'店門口堆好沙包了，颱風過後留著當紀念','egg',3400);}
+let tyAsk=false;
+tyBtn.addEventListener('click',openTyph);
+/* sandbags + tape on your shop */
+const sandbag=new THREE.Group();bldGroup().add(sandbag);
+for(let i=0;i<5;i++){const s=add(sandbag,new THREE.SphereGeometry(.07,10,8),'#C9A66B',-.36+i*.09+(i%2)*.02,SY+.05+(i>2?.07:0),.3);s.scale.set(1.3,.6,1);}
+[[-.05,1],[.05,-1]].forEach(([dx,r])=>{const t=box(sandbag,.36,.02,.012,'#FDD13C',.17+dx*0,SY+.18,.18);t.rotation.z=r*.45;});
+sandbag.visible=false;
+updTyBtn();
+if(typhActive()&&!typh.got&&typh.shown!==tyToday)setTimeout(function ty(){if(cine||!welcome.hidden||!shopBuilt||coachIdx>=0){setTimeout(ty,3000);return;}openTyph();},4000);
+/* umbrellas + light rain while active */
+if(typhActive()){people.forEach((q,i)=>{if(q.i==null&&i%2===0){const u=new THREE.Mesh(new THREE.ConeGeometry(.11,.07,10),lam(['#4F8FEA','#FDD13C','#F2789A','#3DBE94'][i%4]));u.position.y=.32;q.p.add(u);
+  const st=new THREE.Mesh(new THREE.CylinderGeometry(.006,.006,.12,4),lam('#4A4A66'));st.position.y=.27;q.p.add(st);}});
+  document.body.classList.add('tyhol');}
 /* picking */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};fly=null;});
