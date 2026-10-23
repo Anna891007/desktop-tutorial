@@ -269,6 +269,7 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
 .inds button[aria-pressed="true"]{background:#FFFFFF;border-color:#1A73E9;font-weight:700}
 .lbl.shop{background:#FDD13C;color:#1B1F27;font-weight:700}
 .lbl.shop .rk{font-weight:500;font-size:12.5px;background:#FFFFFF;border-radius:99px;padding:2px 8px}
+.wcard p.wnote{margin:8px 0 0;font-size:12.5px;line-height:1.6;color:#5A4A10}
 .wcard .skip{margin-top:10px;border:0;background:none;color:#1B1F27;font-size:14.5px;font-weight:500;text-decoration:underline;cursor:pointer;padding:8px}
 
 .toast{
@@ -471,6 +472,7 @@ pre{margin:0;padding:12px;border-radius:12px;background:#14233A;color:#D8E7F7;fo
     <label class="wf" for="wName">你的店名</label>
     <input class="wfield" id="wName" maxlength="12" placeholder="例如：晴天牙醫" autocomplete="off">
     <div class="inds" id="wInd" role="group" aria-label="選擇產業"></div>
+    <p class="wnote">選你的產業：任務的例子、客人的問題，都會換成你的行業。島上還住著其他行業的鄰居。</p>
     <div class="feats">
       <div><b>🏪 經營你的店</b>點亮 14 格 SEO 關鍵，排名從第 5 頁爬上第 1 名</div>
       <div><b>🙋 幫客人找答案</b>小人頭上冒出問題，答對他就走進你的店</div>
@@ -637,7 +639,7 @@ const ORDER=['kw','intent','cluster','internal','schema','geo','gsc','title','sp
 const COACH=[
  {txt:'這是「{shop}」。店蓋好了，門口卻冷冷清清：在 Google 上排第 5 頁，幾乎沒人翻得到。',act:'shop'},
  {txt:'島上 14 格是 14 個影響排名的關鍵。每點亮一格，那格的建築就會長大，排名往上爬，店門口的客人也會變多。',act:'overview'},
- {txt:'先看一個常見問題（用台中「晴天牙醫」當例子）：官網寫的都是「專業口腔重建」，客人實際搜的卻是「植牙費用」。字對不上，Google 就不會把你推給他們。',act:'focus'},
+ {txt:'{ex}',act:'focus'},
  {txt:'點一下正在發光的「01 關鍵字研究」，進去看看。',wait:'select:kw',hint:'點島上的「01 關鍵字研究」',pulse:'kw'},
  {txt:'每一格都有一個小任務。這題選出客人真的會搜的字，答對了，這格就會插上旗子點亮。',wait:'done:kw',hint:'選出正確答案',top:true},
  {txt:'第一格點亮了！排名往上爬，店門口也來了第一位客人。接下來：島上小人頭頂冒出問題時，點他、幫他找答案；也注意左上角的颱風預報，沒點亮的格子會被吹壞。把「{shop}」推上第 1 名吧！左上角的藍色卡片會一直提示你下一步；右上角「?」是島嶼指南。',last:true}
@@ -685,6 +687,77 @@ const done=store.get('done',{}),checks=store.get('checks',{});
 const INDS={dental:{name:'牙醫診所',color:'#4FA3E3'},food:{name:'餐飲',color:'#F07E5A'},ecom:{name:'電商',color:'#F2AE0C'},b2b:{name:'B2B',color:'#1FA67A'}};
 const shop=Object.assign({name:'晴天牙醫',ind:'dental'},store.get('shop',{}));
 if(!INDS[shop.ind])shop.ind='dental';
+/* industry packs: examples, quizzes and customers change with the player's industry */
+const LT_WHY='長尾字競爭小、意圖明確，小網站最容易先拿下，也最容易成交。';
+const PACKS={
+ dental:{ex:'晴天牙醫',icon:'🦷',cards:{},
+  serp:{u:'晴天牙醫.com › 植牙',d:'整理植牙費用區間、療程步驟與常見問題，看完就知道該準備多少預算。'},
+  asks:{},
+  coach:'先看一個常見問題（用台中「晴天牙醫」當例子）：官網寫的都是「專業口腔重建」，客人實際搜的卻是「植牙費用」。字對不上，Google 就不會把你推給他們。',
+  market:{stalls:[['植牙','搜的人多，但大醫院、連鎖品牌都在搶，很難排上去。'],['台中植牙 費用 分期','搜的人少，但會打這串字的人，幾乎已經準備要做了。'],['植牙 會痛嗎 60歲','問題很具體，一篇好文章就能接住他。']],q:'剛起步的小診所，先搶哪一攤？',opts:['植牙','台中植牙 費用 分期','牙齒']},
+  village:'一篇 3 年前寫的「植牙費用」文章，排名慢慢往下掉，先做什麼？',
+  nb:{owner:'晴天牙醫院長',q:'我們的植牙文章寫得很用心，可是在 Google 上怎麼搜都找不到那一頁。',opts:['再多寫 10 篇文章','到 Search Console 檢查那一頁有沒有被索引、有沒有被 noindex 擋掉','換一家網站主機'],ok:1,why:'先確認頁面有被 Google 收錄。寫得再好，Google 看不到也沒用。',thanks:'找到原因了！原來那頁被設成 noindex，改好了，謝啦！'}},
+ food:{ex:'巷口拉麵',icon:'🍜',
+  cards:{
+   kw:{type:'quiz',title:'猜猜看',q:'巷口拉麵想吸引附近上班族，哪個字最接近客人實際會搜的？',options:[
+    {t:'西屯 拉麵 推薦',ok:true,why:'有地區、有品項，是找店時最常查的組合。'},
+    {t:'匠心職人湯頭美學',ok:false,why:'這是店家的說法，客人很少這樣打。'},
+    {t:'美食',ok:false,why:'範圍太大，看不出對方想吃什麼。'}]},
+   title:{type:'tool',title:'寫一個標題試試',value:'西屯拉麵推薦｜濃厚豚骨、宵夜開到凌晨 1 點｜巷口拉麵'},
+   backlinks:{type:'quiz',title:'哪艘船最值得歡迎？',q:'下面哪一個外部連結，對巷口拉麵最有價值？',options:[
+    {t:'花 500 元買來的 100 個論壇連結',ok:false,why:'品質低，還可能被判定為操縱排名。'},
+    {t:'在地美食部落客的實訪食記',ok:true,why:'主題相關、真實體驗，讀者看完還會直接來店裡。'},
+    {t:'朋友汽車維修網站上的一條連結',ok:false,why:'主題不相關，幫助有限。'}]},
+   geo:{type:'compare',title:'哪一段會被 AI 引用？',bad:'本店秉持職人精神，嚴選食材，用心熬煮每一碗湯頭，歡迎蒞臨品嚐。',
+    good:'巷口拉麵營業到凌晨 1 點，招牌豚骨拉麵一碗 220 元，週一公休，捷運站步行 5 分鐘。',note:'AI 會挑「直接回答問題」的段落。開頭先給答案，再補細節。'}},
+  serp:{u:'巷口拉麵.com › 菜單',d:'豚骨、醬油、沾麵一次看，附停車資訊與營業時間，宵夜時段也吃得到。'},
+  asks:{a1:{who:'加班族',q:'晚上 11 點了，附近還有開的拉麵店嗎？'},a13:{q:'我搜「西屯 拉麵」，跑出來的都是別家。'}},
+  coach:'先看一個常見問題（用「巷口拉麵」當例子）：官網寫的都是「匠心職人湯頭」，客人實際搜的卻是「西屯 拉麵 推薦」。字對不上，Google 就不會把你推給他們。',
+  market:{stalls:[['拉麵','搜的人多，連鎖名店都在搶，很難排上去。'],['西屯 拉麵 宵夜','搜的人少，但打這串字的人現在就餓了。'],['拉麵 外帶 會不會糊','問題很具體，一篇好文章就能接住他。']],q:'剛開幕的小店，先搶哪一攤？',opts:['拉麵','西屯 拉麵 宵夜','日本料理']},
+  village:'一篇 3 年前寫的「菜單價格」頁，價格早就調過了，排名也慢慢往下掉，先做什麼？',
+  nb:{owner:'巷口拉麵老闆',q:'店裡只是裝潢公休兩週，客人卻說在 Google 地圖上看到我們「歇業」了！',opts:['把商家檔案改成永久停業','在商家檔案設成暫時停業或特殊營業時間，再發一則動態說明','不用理它，重新開店就好'],ok:1,why:'暫時公休要用暫時停業或特殊營業時間，永久停業會讓客人以為你收掉了。',thanks:'改好了！客人知道我們只是休息，開幕那天一定請你吃一碗！'}},
+ ecom:{ex:'小島選物',icon:'📦',
+  cards:{
+   kw:{type:'quiz',title:'猜猜看',q:'小島選物賣手工皂，哪個字最接近客人實際會搜的？',options:[
+    {t:'敏感肌 手工皂 推薦',ok:true,why:'有膚質、有品項，是準備下單前最常查的組合。'},
+    {t:'天然純粹生活美學',ok:false,why:'這是品牌的說法，客人很少這樣打。'},
+    {t:'肥皂',ok:false,why:'範圍太大，看不出對方想買什麼。'}]},
+   title:{type:'tool',title:'寫一個標題試試',value:'敏感肌手工皂推薦｜無香料、冷製熟成 90 天｜小島選物'},
+   backlinks:{type:'quiz',title:'哪艘船最值得歡迎？',q:'下面哪一個外部連結，對小島選物最有價值？',options:[
+    {t:'花 500 元買來的 100 個論壇連結',ok:false,why:'品質低，還可能被判定為操縱排名。'},
+    {t:'保養評測網站的實測文章',ok:true,why:'主題相關、有實測，讀者看完就會點進來買。'},
+    {t:'朋友汽車維修網站上的一條連結',ok:false,why:'主題不相關，幫助有限。'}]},
+   geo:{type:'compare',title:'哪一段會被 AI 引用？',bad:'我們堅持天然理念，用心打造每一塊皂，帶給您最純粹的生活體驗。',
+    good:'敏感肌挑手工皂，先看三件事：無香料、冷製法、熟成 60 天以上。以下用三種膚質，列出適合的配方。',note:'AI 會挑「直接回答問題」的段落。開頭先給答案，再補細節。'}},
+  serp:{u:'小島選物.com › 手工皂',d:'依膚質挑選手工皂，成分、用法、退換貨一次說清楚，滿額免運。'},
+  asks:{a1:{who:'上班族',q:'你們有實體門市可以先摸摸看嗎？在哪裡？'},a13:{q:'我搜「敏感肌 手工皂」，跑出來的都是別家。'}},
+  coach:'先看一個常見問題（用「小島選物」當例子）：官網寫的都是「天然純粹生活美學」，客人實際搜的卻是「敏感肌 手工皂 推薦」。字對不上，Google 就不會把你推給他們。',
+  market:{stalls:[['手工皂','搜的人多，大品牌、購物平台都在搶。'],['敏感肌 手工皂 推薦','搜的人少，但打這串字的人已經準備買了。'],['手工皂 洗臉 會乾嗎','問題很具體，一篇好文章就能接住他。']],q:'剛起步的小品牌，先搶哪一攤？',opts:['手工皂','敏感肌 手工皂 推薦','保養品']},
+  village:'一篇 3 年前寫的「手工皂推薦」文章，裡面的商品早就改版，排名也往下掉，先做什麼？',
+  nb:{owner:'小島選物店長',q:'同一款手工皂有 5 種香味，我做了 5 個幾乎一樣的商品頁，結果每一頁排名都上不去。',opts:['再多做 5 頁','整合成一個商品頁，香味用選項切換','每一頁都塞滿關鍵字'],ok:1,why:'內容幾乎一樣的頁面會互相搶排名，整合成一頁更有力。',thanks:'合併成一頁之後清爽多了！送你一塊試用皂～'}},
+ b2b:{ex:'凱倫精密',icon:'🏭',
+  cards:{
+   kw:{type:'quiz',title:'猜猜看',q:'凱倫精密做 CNC 代工，哪個字最接近採購實際會搜的？',options:[
+    {t:'CNC 小量加工 台中',ok:true,why:'有製程、有需求量、有地區，是採購找廠商時常查的組合。'},
+    {t:'全方位智慧製造解決方案',ok:false,why:'這是公司的說法，採購很少這樣打。'},
+    {t:'工廠',ok:false,why:'範圍太大，看不出對方要找什麼。'}]},
+   title:{type:'tool',title:'寫一個標題試試',value:'台中 CNC 小量加工｜3 天打樣、鋁件不鏽鋼皆可｜凱倫精密'},
+   backlinks:{type:'quiz',title:'哪艘船最值得歡迎？',q:'下面哪一個外部連結，對凱倫精密最有價值？',options:[
+    {t:'花 500 元買來的 100 個論壇連結',ok:false,why:'品質低，還可能被判定為操縱排名。'},
+    {t:'產業公會官網的會員廠商介紹頁',ok:true,why:'主題相關、來源可信，一個抵一百個。'},
+    {t:'朋友美食部落格裡的一條連結',ok:false,why:'主題不相關，幫助有限。'}]},
+   geo:{type:'compare',title:'哪一段會被 AI 引用？',bad:'本公司深耕產業多年，秉持品質至上的精神，提供客戶全方位的服務。',
+    good:'CNC 小量加工的交期，主要看材質和公差。一般鋁件打樣約 3 個工作天，以下列出三種常見需求的交期與報價方式。',note:'AI 會挑「直接回答問題」的段落。開頭先給答案，再補細節。'}},
+  serp:{u:'凱倫精密.com › CNC 加工',d:'CNC 銑削、車削小量代工，附材質、公差與交期說明，上傳圖面即可報價。'},
+  asks:{a1:{who:'採購',q:'週六還找得到業務、拿得到報價嗎？'},a13:{q:'我搜「CNC 小量加工」，跑出來的都是別家。'}},
+  coach:'先看一個常見問題（用「凱倫精密」當例子）：官網寫的都是「全方位智慧製造解決方案」，採購實際搜的卻是「CNC 小量加工 台中」。字對不上，Google 就不會把你推給他們。',
+  market:{stalls:[['CNC','搜的人多，大廠和接單平台都在搶。'],['CNC 小量加工 台中','搜的人少，但打這串字的人正在找廠商。'],['鋁件 打樣 要幾天','問題很具體，一篇好文章就能接住他。']],q:'剛起步的小工廠，先搶哪一攤？',opts:['CNC','CNC 小量加工 台中','機械']},
+  village:'一篇 3 年前寫的「設備介紹」頁，機台早就換新，排名也往下掉，先做什麼？',
+  nb:{owner:'凱倫精密業務經理',q:'我們官網的產品型錄全是 PDF 掃描檔，客人說在 Google 上都搜不到規格。',opts:['把 PDF 檔名改長一點','把重點規格整理成網頁文字，PDF 留著當下載','多上傳幾份 PDF'],ok:1,why:'掃描檔裡的字是圖片，Google 讀不到；重點規格寫成網頁文字才搜得到。',thanks:'規格頁上線後，已經有採購打電話來問了，感謝！'}}
+};
+const pack=()=>PACKS[shop.ind]||PACKS.dental;
+const askOf=a=>{const o=pack().asks[a.id];return o?Object.assign({},a,o):a;};
+const nbDone=store.get('nbDone',{});
 const HOUR=(()=>{const h=new URLSearchParams(location.search).get('hour');return h!=null&&h!==''?+h:new Date().getHours();})();
 const SUNSET=HOUR===17,NIGHT=HOUR>=19||HOUR<6;
 const eggs=store.get('eggs',{}),gotCakes=store.get('cakes',{});
@@ -945,7 +1018,37 @@ crown.visible=false;
 tree(shopG,.55,SY,.45,.7);tree(shopG,-.6,SY,.4,.6);
 const shopBase=axial(SHOP_Q,SHOP_R);shopG.position.copy(shopBase);scene.add(shopG);
 const shopO={g:shopG,h:SY-.07,base:shopBase.clone(),lift:0,rise:0};allGroups.push(shopO);
-function applyShop(){shopT.rimMat.color.set(INDS[shop.ind].color);awnMat.color.set(INDS[shop.ind].color);drawSign();updateProg();}
+
+/* neighbour shops: the three other industries */
+const NB_COORDS=[[-2,2],[2,0],[0,-2]],nbLabels=[];
+const NBS=NB_COORDS.map(([q,r],i)=>{
+  used.add(q+','+r);
+  const t=hexTile(.66,'#F4EFE6','#C9CED4'),g=t.g,Y=.73;
+  const aw=new THREE.MeshLambertMaterial({color:'#C9CED4'});
+  box(g,.7,.42,.46,W,0,Y,-.1);box(g,.76,.05,.52,DARK,0,Y+.42,-.1);
+  for(let k=0;k<5;k++){const a=box(g,.15,.03,.2,k%2?W:aw,-.3+k*.15,Y+.35,.2);a.rotation.x=.38;}
+  box(g,.13,.26,.02,DARK,-.15,Y,.135);box(g,.24,.15,.02,'#A9CBF5',.14,Y+.08,.135);
+  const sc=document.createElement('canvas');sc.width=256;sc.height=80;const st=new THREE.CanvasTexture(sc);
+  const sm=new THREE.Mesh(new THREE.PlaneGeometry(.72,.225),new THREE.MeshBasicMaterial({map:st}));sm.position.set(0,Y+.6,.11);g.add(sm);
+  box(g,.78,.27,.03,DARK,0,Y+.465,.08);
+  const mark=new THREE.Group();mark.position.set(.32,Y+1.05,.2);g.add(mark);
+  box(mark,.07,.2,.07,'#FDD13C',0,.09,0);add(mark,new THREE.SphereGeometry(.045,10,8),'#FDD13C',0,0,0);
+  tree(g,.52,Y,-.42,.6);
+  const base=axial(q,r);g.position.copy(base);scene.add(g);
+  const o={g,h:.66,base:base.clone(),lift:0,rise:0,rim:t.rimMat,aw,sc,st,mark,Y};allGroups.push(o);return o;
+});
+let nbInd=[];
+function updateNB(){
+  nbInd=Object.keys(INDS).filter(k=>k!==shop.ind).slice(0,3);
+  NBS.forEach((o,i)=>{const k=nbInd[i],P=PACKS[k],c=INDS[k].color;o.rim.color.set(c);o.aw.color.set(c);
+    const x=o.sc.getContext('2d');x.fillStyle='#FFFFFF';x.fillRect(0,0,256,80);x.fillStyle=c;x.fillRect(0,0,256,8);x.fillRect(0,72,256,8);
+    x.fillStyle='#1B1F27';x.textAlign='center';x.textBaseline='middle';let fs=36;
+    do{x.font=`900 ${fs}px "Noto Sans TC","PingFang TC",sans-serif`;fs-=2;}while(x.measureText(P.ex).width>230&&fs>18);
+    x.fillText(P.ex,128,41);o.st.needsUpdate=true;o.mark.visible=!nbDone[k];
+    if(nbLabels[i])nbLabels[i].textContent=`${P.icon} ${P.ex}${nbDone[k]?' ✓':' ❗'}`;});
+}
+updateNB();if(document.fonts)document.fonts.ready.then(updateNB);
+function applyShop(){updateNB();shopT.rimMat.color.set(INDS[shop.ind].color);awnMat.color.set(INDS[shop.ind].color);drawSign();updateProg();}
 function ring(n){const out=[];if(!n)return [[0,0]];const dirs=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];let q=-n,r=n;
   for(let i=0;i<6;i++)for(let j=0;j<n;j++){out.push([q,r]);q+=dirs[i][0];r+=dirs[i][1];}return out;}
 let seed=7;const rnd=()=>((seed=(seed*9301+49297)%233280)/233280);
@@ -1154,7 +1257,7 @@ for(let i=0;i<5;i++){
 /* little people */
 const people=[];
 const SHIRTS=['#1A73E9','#FDB022','#F07E5A','#1FA67A','#7C5CE0','#EE5A7C','#F6F4EF','#3D4B63'];
-const hosts=tiles.concat(decoTiles);
+const hosts=tiles.concat(decoTiles,NBS);
 function makePerson(){
   const p=new THREE.Group();
   const body=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,.15,8),lam(SHIRTS[Math.floor(rnd()*SHIRTS.length)]));body.position.y=.075;p.add(body);
@@ -1277,7 +1380,7 @@ function markDone(id){
 
 /* cards */
 function renderCard(t){
-  const holder=$('sCard'),d=t.card;holder.innerHTML='';
+  const holder=$('sCard'),d=pack().cards[t.id]||t.card;holder.innerHTML='';
   const c=el('div','card');c.appendChild(el('h3',null,d.title));
   if(d.type==='quiz'){
     c.appendChild(el('p','q',d.q));const res=el('p','res');
@@ -1302,7 +1405,7 @@ function renderCard(t){
     const inp=el('input','field');inp.value=d.value;inp.setAttribute('aria-label','標題');
     const meter=el('div','meter');const ml=el('b'),mr=el('span');meter.append(ml,mr);
     const serp=el('div','serp');const ti=el('div','t');
-    serp.append(el('div','u','晴天牙醫.com › 植牙'),ti,el('div','d','整理植牙費用區間、療程步驟與常見問題，看完就知道該準備多少預算。'));
+    serp.append(el('div','u',pack().serp.u),ti,el('div','d',pack().serp.d));
     const upd=()=>{const n=[...inp.value].length;ml.textContent=`${n} 個字`;
       const ok=n>=12&&n<=32;mr.textContent=n<12?'太短，看不出內容':ok?'長度剛好':'偏長，後面可能被截掉';
       mr.style.color=ok?'var(--ok)':'var(--no)';ti.textContent=inp.value||'（還沒寫標題）';if(ok)markDone(t.id);};
@@ -1391,7 +1494,7 @@ $('tNext').addEventListener('click',()=>{if(tourIdx<TOUR.length-1){tourIdx++;ren
 const stepsEl=$('cSteps');COACH.forEach(()=>stepsEl.appendChild(el('i')));
 function renderCoach(){
   const s=COACH[coachIdx];coach.hidden=false;
-  $('cTxt').textContent=s.txt.replace(/\{shop\}/g,shop.name);
+  $('cTxt').textContent=s.txt.replace('{ex}',pack().coach).replace(/\{shop\}/g,shop.name);
   const hint=$('cHint');hint.hidden=!s.hint;hint.textContent=s.hint?'▸ '+s.hint:'';
   [...stepsEl.children].forEach((x,i)=>x.classList.toggle('on',i<=coachIdx));
   const nx=$('cNext');nx.hidden=!!s.wait;nx.textContent=s.last?'開始探索':'下一步';
@@ -1415,7 +1518,7 @@ $('cSkip').addEventListener('click',()=>endCoach());
 /* shop setup in the welcome card */
 const wName=$('wName'),wInd=$('wInd');
 Object.entries(INDS).forEach(([k,v])=>{const b=el('button',null,v.name);b.type='button';b.dataset.k=k;
-  b.addEventListener('click',()=>{shop.ind=k;syncInd();});wInd.appendChild(b);});
+  b.addEventListener('click',()=>{const cur=wName.value.trim();if(!cur||Object.values(PACKS).some(P=>P.ex===cur))wName.value=PACKS[k].ex;shop.ind=k;syncInd();});wInd.appendChild(b);});
 function syncInd(){[...wInd.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===shop.ind));}
 function openWelcome(){wName.value=shop.name;syncInd();welcome.hidden=false;}
 function saveShop(){shop.name=wName.value.trim()||shop.name||'晴天牙醫';store.set('shop',shop);applyShop();}
@@ -1429,7 +1532,7 @@ $('bHelp').addEventListener('click',()=>openGuide());
 function renderList(){
   const lBody=$('lBody');lBody.innerHTML='';
   const sum=$('dexSum');sum.innerHTML='';
-  [`觀念卡 ${litCount()} / ${TOPICS.length}`,`客人 ${helpedCount()} / ${ASKS.length}`,`彩蛋 ${Object.keys(eggs).length} / ${EGGS.length}`,`太陽餅 ${Object.keys(store.get('cakes',{})).length} / 7`,`連續登入 ${daily.streak||0} 天`].forEach(s=>sum.appendChild(el('span',null,s)));
+  [`觀念卡 ${litCount()} / ${TOPICS.length}`,`客人 ${helpedCount()} / ${ASKS.length}`,`鄰居 ${nbInd.filter(k=>nbDone[k]).length} / 3`,`彩蛋 ${Object.keys(eggs).length} / ${EGGS.length}`,`太陽餅 ${Object.keys(store.get('cakes',{})).length} / 7`,`連續登入 ${daily.streak||0} 天`].forEach(s=>sum.appendChild(el('span',null,s)));
   Object.entries(ZONES).forEach(([k,z])=>{
     const h=el('h3');h.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.name}`;lBody.appendChild(h);
     TOPICS.filter(t=>t.zone===k).sort((a,b)=>a.no.localeCompare(b.no)).forEach(t=>{
@@ -1440,7 +1543,7 @@ function renderList(){
     });
   });
   lBody.appendChild(el('h3',null,'🙋 客人圖鑑'));
-  ASKS.forEach(a=>{const r=el('div','cust'+(helped[a.id]?'':' no'));
+  ASKS.map(askOf).forEach(a=>{const r=el('div','cust'+(helped[a.id]?'':' no'));
     r.textContent=helped[a.id]?`✓ ${a.who}：「${a.q}」`:'？？？ 還沒幫到這位客人';lBody.appendChild(r);});
   lBody.appendChild(el('h3',null,'🥚 彩蛋'));
   const E=eggs;
@@ -1519,7 +1622,7 @@ function setSt(t){if(t!==lastStTxt){stTxt.textContent=t;lastStTxt=t;}}
 const bubW=el('div','bubw'),bub=el('button','bub');bubW.appendChild(bub);bubW.hidden=true;labelsEl.appendChild(bubW);
 let ask=null,nextAskAt=performance.now()+4000;
 function spawnAsk(now){
-  const pool=ASKS.filter(a=>!helped[a.id]);const a=(pool.length?pool:ASKS)[Math.floor(Math.random()*(pool.length||ASKS.length))];
+  const pool=ASKS.filter(a=>!helped[a.id]);const a=askOf((pool.length?pool:ASKS)[Math.floor(Math.random()*(pool.length||ASKS.length))]);
   const hosts=people.filter(q=>q.i==null&&q.p.visible);if(!hosts.length){nextAskAt=now+3000;return;}
   ask={a,q:hosts[Math.floor(Math.random()*hosts.length)],until:now+30000};
   bub.innerHTML='';bub.append(el('i',null,`🙋 ${a.who}在搜尋`),document.createTextNode(a.q));bubW.hidden=false;
@@ -1644,8 +1747,8 @@ const ACTS={
    const ol=el('div');for(let i=1;i<=10;i++){const d=el('div','cust'+(i===r?'':' no'));d.textContent=`${i}. ${i===r?'👉 '+shop.name:'別家網站'}`;ol.appendChild(d);}b.appendChild(ol);});},
  market(){flyLM('market');
   openLM('長尾關鍵字夜市','每個攤位賣一組關鍵字，越長的字越精準',b=>{
-   [['植牙','搜的人多，但大醫院、連鎖品牌都在搶，很難排上去。'],['台中植牙 費用 分期','搜的人少，但會打這串字的人，幾乎已經準備要做了。'],['植牙 會痛嗎 60歲','問題很具體，一篇好文章就能接住他。']].forEach(([k,d])=>{const r=el('div','cust');r.append(el('b',null,`🏮「${k}」`),el('span',null,d));r.style.flexDirection='column';r.style.gap='2px';b.appendChild(r);});
-   quiz(b,'剛起步的小診所，先搶哪一攤？',['植牙','台中植牙 費用 分期','牙齒'],1,'長尾字競爭小、意圖明確，小網站最容易先拿下，也最容易成交。',()=>egg('market'));});},
+   const M=pack().market;M.stalls.forEach(([k,d])=>{const r=el('div','cust');r.append(el('b',null,`🏮「${k}」`),el('span',null,d));r.style.flexDirection='column';r.style.gap='2px';b.appendChild(r);});
+   quiz(b,M.q,M.opts,1,LT_WHY,()=>egg('market'));});},
  opera(){flyLM('opera');egg('opera');
   openLM('內容殿堂','你點亮的觀念卡，都在這裡展出',b=>{
    const g=el('div','gallery');TOPICS.slice().sort((x,y)=>x.no.localeCompare(y.no)).forEach(t=>{const c=el('div','gcard'+(done[t.id]?'':' locked'));
@@ -1657,7 +1760,7 @@ const ACTS={
  village(){flyLM('village');
   if(eggs.village){toast('🎨 眷村已經刷新完成。舊文章也要定期翻新喔！');return;}
   openLM('彩虹眷村｜舊文翻新','老房子刷上新油漆，舊文章也能重新被看見',b=>{
-   quiz(b,'一篇 3 年前寫的「植牙費用」文章，排名慢慢往下掉，先做什麼？',['直接刪掉','更新價格與內容，保留原本網址','換一個新網址重新發一篇'],1,'更新過時的資訊、補上新內容，並保留原網址，累積的排名和連結都留得住。',()=>{repaint=performance.now();egg('village');});});},
+   quiz(b,pack().village,['直接刪掉','更新價格與內容，保留原本網址','換一個新網址重新發一篇'],1,'更新過時的資訊、補上新內容，並保留原網址，累積的排名和連結都留得住。',()=>{repaint=performance.now();egg('village');});});},
  valley(){egg('valley');lmTour();},
  pirate(){
   openLM('🏴‍☠️ 黑帽 SEO 海盜船','「嘿，老闆！要不要買 1000 條連結？只要 999 元，保證衝第 1 名！」',b=>{
@@ -1684,9 +1787,18 @@ if(eggs.village)paintVillage(1);
 const TOURS=['office','wheel','market','opera','wetland','village','valley'];
 function lmTour(){if(touring)endTour();deselect();let i=0;
   const step=()=>{if(i>=TOURS.length){home();toast('🗺️ 環島導覽結束！每個地標都可以點喔');return;}const k=TOURS[i++];flyLM(k);toast(LM[k].name,'warn',2000);setTimeout(step,2300);};step();}
-function runAct(a){if(!a)return false;if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
+function runAct(a){if(!a)return false;if(/^nb\d$/.test(a)){nbAct(+a[2]);return true;}if(LM[a]&&!seen[a]){seen[a]=1;store.set('seen',seen);}if(a.startsWith('cake:')){collectCake(+a.slice(5));return true;}if(ACTS[a]){ACTS[a]();return true;}return false;}
+/* neighbours are landmarks too */
+NBS.forEach((o,i)=>{clickable(o.g,'nb'+i);LM['nb'+i]={obj:o.g,y:1.55,name:'',dist:6};});
+function nbAct(i){const k=nbInd[i],P=PACKS[k],o=NBS[i];if(selected)deselect();flyTo(o.base.clone().setY(o.h),isMobile()?14:10);
+  if(nbDone[k]){toast(`${P.icon} ${P.nb.owner}：「${P.nb.thanks}」`);return;}
+  openLM(`${P.icon} 鄰居「${P.ex}」的煩惱`,`${INDS[k].name}｜${P.nb.owner}`,b=>{
+   b.appendChild(el('p','mq',`「${P.nb.q}」`));
+   quiz(b,'你會建議他怎麼做？',P.nb.opts,P.nb.ok,P.nb.why,()=>{nbDone[k]=1;store.set('nbDone',nbDone);updateNB();renderList();
+    setTimeout(()=>toast(`${P.icon} ${P.nb.owner}：「${P.nb.thanks}」`,null,3800),700);});});}
 /* landmark labels */
 Object.entries(LM).forEach(([k,L])=>{const b=el('button','lbl lm',L.name+(k==='office'&&NIGHT?'｜💡加班中':''));b.addEventListener('click',()=>runAct(k));labelsEl.appendChild(b);L.label=b;});
+NBS.forEach((o,i)=>nbLabels[i]=LM['nb'+i].label);updateNB();
 /* secret: type S-E-O, or tap the island name 3 times */
 let keyBuf='';
 addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;keyBuf=(keyBuf+e.key.toUpperCase()).slice(-3);if(keyBuf==='SEO'){keyBuf='';fireShow();egg('fireworks');}});
@@ -1711,6 +1823,7 @@ function lmTick(now,w,h){
     if(pirateRun.flee)pirateRun.t0-=8;
     if(k>=1){pirate.visible=false;pirateRun=null;pirateNext=now+70000+Math.random()*40000;}}
   fireTick();
+  if(!reduce)NBS.forEach((o,i)=>{if(o.mark.visible){o.mark.position.y=o.Y+1.05+Math.sin(now/300+i)*.06;o.mark.rotation.y=now/700;}});
   Object.values(LM).forEach(L=>{const p=L.obj.getWorldPosition(v);p.y+=L.y;p.project(camera);
     L.label.classList.toggle('off',p.z>1);L.label.style.transform=`translate(${(p.x+1)/2*w}px,${(1-p.y)/2*h}px) translate(-50%,-100%)`;});
 }
@@ -1732,6 +1845,8 @@ function nextGoal(now){
   if(stormAt&&stormAt!==Infinity&&stormAt-now<25000&&unlit.length)return {k:'soon',t:`⏳ 颱風 ${mmss(stormAt-now)} 後到，先點亮一格！`,s:'沒點亮的格子會被吹壞',alert:1,a:()=>select(unlit[0])};
   if(unlit.length&&lit<3)return {k:'t'+unlit[0],t:`▶ 下一步：點亮「${byId[unlit[0]].no} ${byId[unlit[0]].name}」`,s:'完成格子裡的小任務，排名就會往上爬',a:()=>select(unlit[0])};
   if(daily.last!==dayKey(new Date()))return {k:'daily',t:'📅 今日任務還沒做',s:'每天一題，連續登入店旁會開櫻花樹',a:openDaily};
+  const nbi=nbInd.findIndex(k=>!nbDone[k]);
+  if(nbi>=0&&lit>=2)return {k:'nb'+nbi,t:`🏘️ 鄰居「${PACKS[nbInd[nbi]].ex}」有煩惱`,s:'頭上有 ❗ 的老闆需要你的 SEO 建議',a:()=>runAct('nb'+nbi)};
   const lm=TOURS.find(k=>!seen[k]);
   if(lm)return {k:'lm'+lm,t:`🗺️ 去看看「${LM[lm].name.replace(/^\S+\s/,'')}」`,s:'島外的台中地標，點了都有事會發生',a:()=>runAct(lm)};
   if(unlit.length)return {k:'t'+unlit[0],t:`▶ 下一步：點亮「${byId[unlit[0]].no} ${byId[unlit[0]].name}」`,s:`還差 ${unlit.length} 格衝上第 1 名`,a:()=>select(unlit[0])};
@@ -1762,7 +1877,7 @@ function openGuide(){
   [['拖曳','旋轉整座島'],[isMobile()?'雙指':'滾輪','放大縮小'],['點六角格','做小任務、點亮那一格'],['點地標或小人','會有事情發生']].forEach(([a,c])=>{const d=el('div');d.append(el('b',null,a),document.createTextNode(c));k.appendChild(d);});
   b.appendChild(k);
   b.appendChild(el('h3',null,'⚡ 島上會發生的事'));
-  [['🙋','客人搜尋泡泡','小人頭上冒出問題，選對格子他就走進你的店'],['🌀','演算法颱風','左上角倒數，時間到會吹壞最多 3 格沒點亮的格子，排名下降'],['🏴‍☠️','黑帽海盜船','偶爾從遠方駛過，點它看看它想賣你什麼'],['🌅','高美夕陽','傍晚 5–6 點進站，整座島會變成金色'],['💡','加班中','晚上進站，萬智匯 20 樓的燈還亮著']].forEach(([i,t,d])=>{
+  [['🙋','客人搜尋泡泡','小人頭上冒出問題，選對格子他就走進你的店'],['🏘️','鄰居的煩惱','島上還有其他行業的店，頭上有 ❗ 的老闆需要你的 SEO 建議'],['🌀','演算法颱風','左上角倒數，時間到會吹壞最多 3 格沒點亮的格子，排名下降'],['🏴‍☠️','黑帽海盜船','偶爾從遠方駛過，點它看看它想賣你什麼'],['🌅','高美夕陽','傍晚 5–6 點進站，整座島會變成金色'],['💡','加班中','晚上進站，萬智匯 20 樓的燈還亮著']].forEach(([i,t,d])=>{
     const r_=el('div','gl');r_.append(el('span','i',i));const x=el('div');x.append(el('b',null,t),document.createTextNode(d));r_.appendChild(x);b.appendChild(r_);});
   b.appendChild(el('h3',null,'🗺️ 台中地標（點了都有事）'));
   TOURS.forEach(id=>{const L=LM[id];const r_=el('div','gl');const x=el('div');x.append(el('b',null,L.name+(seen[id]?'　✓':'')));r_.appendChild(x);
